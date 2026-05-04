@@ -1,14 +1,79 @@
+import Image from "next/image";
 export default function Login() {
-    return(
-        <div className="bg-[#fff8e7] min-h-screen flex">
-            <div className="w-1/2 flex flex-col justify-center">
+    return (
+        //Fundo do site 
+        <div className="bg-[#f6f3e4] min-h-screen flex">
+            {/*Lado Direito da tela */}
+            <div className="w-1/2 flex flex-col justify-start px-24 pt-8">
+            {/*Imagem da logo*/}
+            <Image 
+            src= "/images/logo_stock.io.png"
+            alt = "logo da Stock.io"
+            width={421}
+            height={267}
+            className="-mt-16"
+           
+            />
+            <Image
+            src= "/images/mascote_login.png"
+            alt = "mascote"
+            width ={512.5516357421875}
+            height={1118.5}
+            
+
+            />
+
+
 
             </div>
+            {/*Lado Esquerdo da tela */}
             <div className="w-1/2 flex flex-col justify-center ">
+                {/*Bloco preto onde fica  as informações  */}
+                <div className="bg-[#171918] p-10 rounded-[3rem] w-[654px] h-[1068px]   mt-24 flex  flex-col  items-center">
+                    {/*Bloco para o formulário */}
+                    <div className="bg-[#171918] p-8 w-[504px] h-[402px]  flex flex-col justify-center ">
+                    <h2 className="text-white text-3xl font-extrabold text-center mb-8 uppercase tracking-wide">
+                        Bem vindo de volta!
+                    </h2>
+                    {/*barra email*/}
+                    <input
+                        className=" bg-[#f6f3e4] text-gray-900 px-6 py-3 rounded-full mb-4 outline-none"
+                        type="email"
+                        placeholder="Email"
+                    />
+                    {/*barra senha*/}
+                    <div className="relative w-full">
+                        <input
+                            type="password"
+                            placeholder="Senha"
+                            className="bg-[#f6f3e4] text-gray-900 placeholder-gray-400 px-6 py-3 rounded-full w-full outline-none"
+                        />
+                    </div>
+                    {/*Link esqueceu a senha*/}
+                    <div className="text-center mt-8 mb-8">
+                        <a href="#" className="text-[#ffffff]  text-sm underline decoration-gray-500 hover:text-gray-500 ">
+                            Esqueceu sua senha?
+                        </a>
+                    </div>
+
+                    {/* Botão Entrar */}
+                    <button className="bg-[#6A38F3] text-white font-bold text-lg py-3 rounded-full w-full mb-8 hover:bg-[#652cd4] transition-all uppercase tracking-wider">
+                        Entrar
+                    </button>
+
+                    {/* Parte que leva ao cadastro */}
+                    <p className="text-white text-sm">Não possui uma conta?
+                        <a className="text-[#6A38F3] text-sm font-bold hover:underline"> Cadastre-se</a>
+                    </p>
+
+                   </div>
+
+                </div>
+
 
             </div>
 
-         </div>
+        </div>
     );
 
 
