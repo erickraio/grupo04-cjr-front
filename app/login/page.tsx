@@ -2,11 +2,42 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
-
+import api from "../services/api";
+import Link from "next/link";
 
 
 export default function Login() {
+    const [isLoading, setIsLoading] = useState(false);
 
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (isLoading) return;
+        setIsLoading(true);
+
+
+
+        try {
+            const response = await api.post("/auth/login", {
+                email: email,
+                password: password,
+            });
+            const token = response.data.token;
+            localStorage.setItem("@StockIO:token", token);
+            alert("Login realizado com sucesso!");
+        }
+        catch (error: any) {
+            const mensagemErro = error.response?.data?.message || "Erro ao conectar com o servidor";
+            alert(mensagemErro);
+
+
+        } finally {
+            setIsLoading(false);
+        };
+
+    }
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
     const togglePasswordVisibility = () => {
@@ -49,6 +80,8 @@ export default function Login() {
                         </h2>
                         {/*barra email*/}
                         <input
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className=" bg-[#f6f3e4] text-gray-900 px-6 py-3 rounded-full mb-4 outline-none"
                             type="email"
                             placeholder="Email"
@@ -57,8 +90,10 @@ export default function Login() {
 
                         <div className="relative w-full">
                             <input
-                                type={showPassword ? "text" : "password"} 
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Senha"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 className="bg-[#f6f3e4] text-gray-900 placeholder-gray-400 px-6 py-3 rounded-full w-full outline-none pr-12"
                             />
                             <button
@@ -73,24 +108,32 @@ export default function Login() {
                                 )}
                             </button>
                         </div>
-                    
-                    {/*Link esqueceu a senha*/}
-                    <div className="text-center mt-8 mb-8">
-                        <a href="#" className="text-[#ffffff]  text-sm underline decoration-gray-500 hover:text-gray-500 ">
-                            Esqueceu sua senha?
-                        </a>
+
+                        {/*Link esqueceu a senha*/}
+                        <div className="text-center mt-8 mb-8">
+                            <Link
+                                href="/recuperar-senha"
+                                className="text-[#ffffff]  text-sm underline decoration-gray-500 hover:text-gray-500 ">
+                                Esqueceu sua senha?
+                            </Link>
+                        </div>
+
+                        {/* Botão Entrar */}
+                        <button
+                            onClick={handleLogin}
+                            disabled={isLoading}
+                            className="bg-[#6A38F3] text-white font-bold text-lg py-3 rounded-full w-full mb-8 hover:bg-[#652cd4] transition-all uppercase tracking-wider">
+                            {isLoading ? "Carregando..." : "Entrar"}
+                        </button>
+
+                        {/* Parte que leva ao cadastro */}
+                        <p className="text-white text-sm">Não possui uma conta?
+                            <Link
+                                className="text-[#6A38F3] text-sm font-bold hover:underline"
+                                href="/cadastro"
+                            > Cadastre-se</Link>
+                        </p>
                     </div>
-
-                    {/* Botão Entrar */}
-                    <button className="bg-[#6A38F3] text-white font-bold text-lg py-3 rounded-full w-full mb-8 hover:bg-[#652cd4] transition-all uppercase tracking-wider">
-                        Entrar
-                    </button>
-
-                    {/* Parte que leva ao cadastro */}
-                    <p className="text-white text-sm">Não possui uma conta?
-                        <a className="text-[#6A38F3] text-sm font-bold hover:underline"> Cadastre-se</a>
-                    </p>
-                 </div>
                 </div>
 
             </div>
@@ -98,7 +141,7 @@ export default function Login() {
 
         </div>
 
-        
+
     );
 
 
