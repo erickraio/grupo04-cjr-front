@@ -1,27 +1,39 @@
-    import React from 'react';
-    import {User, LogOut} from 'lucide-react';
-    import Link from 'next/link';
+'use client';
+import React, {useEffect, useState} from 'react';
+import {User, LogOut} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-    interface NavbarProps {
-        logado: boolean;
-        onLogin?: () => void;
-        onRegister?: () => void;
-        onProfile?: () => void;
-        onLogout?: () => void;
+    export default function Navbar() {
+        const [logado, setLogado] = useState(false);
+        const router = useRouter();
+
+    useEffect(() => {
+        const token = localStorage.getItem("@StockIO:token");
+        if (token){
+            setLogado(true);
+        }
+    }, [])
+
+    const handleLogout = () => {
+        localStorage.removeItem("@StockIO:token");
+        setLogado(false);
+        router.push("/login");
     }
 
-    export default function Navbar({ logado, onLogin, onRegister, onProfile, onLogout }: NavbarProps) {
         return (
             <nav className="flex justify-between items-center bg-black px-10 h-[70px] w-full box-border select-none">
                 <div className="flex items-center">
-                    <img src="/stockio.png" alt="Logo Stockio" className="h-10 w-auto object-contain"/>
+                    <Link href="/">
+                        <img src="/stockio.png" alt="Logo Stockio" className="h-10 w-auto object-contain"/>
+                    </Link>
                 </div>
 
                 <div className="flex items-center">
                     {logado?(
                         <div className="flex items-center gap-6">
                             <button 
-                                onClick={onProfile}
+                                onClick={() => router.push("/perfil")}
                                 className="text-white transition-colors cursor-pointer"
                                 title="Perfil"
                                 >
@@ -29,7 +41,7 @@
                             </button>
 
                             <button 
-                                onClick={onLogout}
+                                onClick={handleLogout}
                                 className="text-white transition-colors cursor-pointer"
                                 title="Sair"
                                 >
@@ -56,4 +68,4 @@
                 </div>
             </nav>
         );
-    }
+    }   
