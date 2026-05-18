@@ -22,7 +22,7 @@ export default function Login() {
                 email: email,
                 password: password,
             });
-            const token = response.data.token;
+            const token = response.data.access_token;
             localStorage.setItem("@StockIO:token", token);
             alert("Login realizado com sucesso!");
         }
