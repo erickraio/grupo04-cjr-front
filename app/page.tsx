@@ -1,3 +1,4 @@
+import Navbar from "./components/navbar";
 import Image from "next/image";
 
 // ==========================================
@@ -10,9 +11,9 @@ const categorias = [
   { id: 2, nome: "Farmácia", imagem: "/farmacia-token.png" },
   { id: 3, nome: "Beleza", imagem: "/beleza-token.png" },
   { id: 4, nome: "Moda", imagem: "/moda-token.png" },
-  { id: 5, nome: "Eletrônicos", imagem: "/eletronicos-token.png" },
+  { id: 5, nome: "Eletrônicos", imagem: "/eletronico-token.png" },
   { id: 6, nome: "Jogos", imagem: "/jogos-token.png" },
-  { id: 7, nome: "Brinquedos", imagem: "/brinquedos-token.png" },
+  { id: 7, nome: "Brinquedos", imagem: "/brinquedo-token.png" },
   { id: 8, nome: "Casa", imagem: "/casa-token.png" },
 ];
 
@@ -60,6 +61,9 @@ const lojas = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#F6F5ED]">
+
+        {/* NAVBAR */}
+      <Navbar />
       
       {/* 1. SESSÃO PRETA (HERO) - Mantida exatamente igual */}
       <section className="bg-black w-full pt-28 px-6 md:px-12 flex justify-center relative overflow-hidden">
@@ -75,6 +79,7 @@ export default function Home() {
               src="/hero-illustration.png" 
               alt="Personagem do Stock.io organizando caixas" 
               fill 
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-contain object-bottom md:object-right-bottom"
               priority 
             />
@@ -115,6 +120,7 @@ export default function Home() {
                         alt={`Ícone ${categoria.nome}`} 
                         width={40} 
                         height={40} 
+                        style={{ width: 'auto', height: 'auto' }}
                       />
                     </div>
                     
@@ -258,4 +264,5 @@ function CardProduto({ data }: { data: any }) {
 
     </div>
   );
+
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import api from "../services/api";
@@ -22,7 +22,7 @@ export default function Login() {
                 email: email,
                 password: password,
             });
-            const token = response.data.token;
+            const token = response.data.access_token;
             localStorage.setItem("@StockIO:token", token);
             alert("Login realizado com sucesso!");
         }
