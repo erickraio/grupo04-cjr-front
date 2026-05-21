@@ -47,6 +47,10 @@ const lojas = [
   { id: 4, nome: "Mini Reno", categoria: "casa", cor: "bg-[#2D2D2D]" },
   { id: 5, nome: "amoca", categoria: "moda", cor: "bg-white" },
   { id: 6, nome: "Repiit", categoria: "eletrônicos", cor: "bg-white" },
+  { id: 7, nome: "Repiit", categoria: "eletrônicos", cor: "bg-white" },
+  { id: 8, nome: "Repiit", categoria: "eletrônicos", cor: "bg-white" },
+  { id: 9, nome: "Repiit", categoria: "eletrônicos", cor: "bg-white" },
+  { id: 10, nome: "Repiit", categoria: "eletrônicos", cor: "bg-white" },
 ];
 
 // ==========================================
@@ -82,7 +86,7 @@ export default function Home() {
       <section className="w-full px-6 md:px-12 py-8 flex justify-center">
         <div className="max-w-6xl w-full flex flex-col gap-12">
           
-          {/* Barra de Pesquisa - Mantida igual */}
+          {/* Barra de Pesquisa */}
           <div className="flex justify-end w-full">
             <div className="relative w-full md:w-[450px]">
               <input 
@@ -97,16 +101,26 @@ export default function Home() {
           </div>
 
           {/* Categorias*/}
-          <div>
+        <div>
             <h2 className="text-2xl font-bold text-black mb-6">Categoria</h2>
-            <div className="flex gap-4 md:gap-8 overflow-x-auto pb-4 scrollbar-hide">
+            
+            {/* Atualizado com os mesmos paddings (pb-6 pt-2) e scrollbar-hide para manter o padrão */}
+            <div className="flex gap-4 md:gap-8 overflow-x-auto pb-6 pt-2 scrollbar-hide">
                {categorias.map((categoria) => (
-                 <div key={categoria.id} className="flex flex-col items-center gap-4 min-w-[96px]">
-                    <div className="w-[104px] h-[92px] bg-white rounded-3xl flex items-center justify-center shadow-[0px_4px_12px_rgba(0,0,0,0.03)] border border-transparent hover:border-indigo-100 transition-colors cursor-pointer">
-                      <Image src={categoria.imagem} alt={`Ícone ${categoria.nome}`} width={40} height={40} className="object-contain" />
+                 <div key={categoria.id} className="flex flex-col items-center gap-4 min-w-[104px] cursor-pointer group">
+                    
+                    <div className="w-[104px] h-[92px] bg-white rounded-3xl flex items-center justify-center shadow-[0px_4px_12px_rgba(0,0,0,0.03)] border border-transparent group-hover:border-indigo-100 transition-colors">
+                      <Image 
+                        src={categoria.imagem} 
+                        alt={`Ícone ${categoria.nome}`} 
+                        width={40} 
+                        height={40} 
+                      />
                     </div>
+                    
                     <span className="text-sm font-semibold text-black">{categoria.nome}</span>
                  </div>
+                 
                ))}
             </div>
           </div>
@@ -122,13 +136,16 @@ export default function Home() {
               <span className="text-sm font-medium text-[#7C3AED]">melhores avaliados</span>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {produtosAvaliados.map((produto) => (
-                <CardProduto key={produto.id} data={produto} />
+            <div className="flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
+                {produtosAvaliados.map((produto) => (
+                <div key={produto.id} className="min-w-[220px] md:min-w-[260px]">
+                <CardProduto data={produto} />
+              </div>
               ))}
             </div>
           </div>
 
+          {/* Produtos: Mais Baratos */}
           {/* Produtos: Mais Baratos */}
           <div className="mt-6">
             <div className="flex items-baseline gap-3 mb-6">
@@ -136,13 +153,16 @@ export default function Home() {
               <span className="text-sm font-medium text-[#7C3AED]">mais baratos</span>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            <div className="flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
               {produtosBaratos.map((produto) => (
-                <CardProduto key={produto.id} data={produto} />
+                <div key={produto.id} className="min-w-[220px] md:min-w-[260px]">
+                  <CardProduto data={produto} />
+                </div>
               ))}
             </div>
           </div>
 
+          {/* Produtos: Recém Adicionados */}
           {/* Produtos: Recém Adicionados */}
           <div className="mt-6">
             <div className="flex items-baseline gap-3 mb-6">
@@ -150,19 +170,22 @@ export default function Home() {
               <span className="text-sm font-medium text-[#7C3AED]">recém adicionados</span>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            <div className="flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
               {produtosRecentes.map((produto) => (
-                <CardProduto key={produto.id} data={produto} />
+                <div key={produto.id} className="min-w-[220px] md:min-w-[260px]">
+                  <CardProduto data={produto} />
+                </div>
               ))}
             </div>
           </div>
 
           {/* Secção Lojas */}
+          {/* Secção Lojas */}
           <div className="mt-12 mb-20">
             <div className="flex justify-between items-end mb-8">
               <h2 className="text-3xl font-bold text-black">Lojas</h2>
               
-              {/* Botão de Filtro (Dropdown mock) */}
+              {/* Botão de Filtro */}
               <button className="flex items-center gap-12 bg-white rounded-full px-6 py-2 shadow-sm text-[#A78BFA] font-medium text-lg border border-transparent hover:border-indigo-100 transition-all">
                 filtros
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,9 +198,8 @@ export default function Home() {
             <div className="flex gap-6 md:gap-10 overflow-x-auto pb-4 scrollbar-hide">
               {lojas.map((loja) => (
                 <div key={loja.id} className="flex flex-col items-center gap-3 min-w-[130px] cursor-pointer">
-                  {/* Círculo da Loja (Placeholder) */}
+                  {/* Círculo da Loja */}
                   <div className={`w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] ${loja.cor} text-white font-bold text-center p-2`}>
-                     {/* No futuro: <Image src={loja.logoUrl} ... /> */}
                      {loja.cor.includes('bg-white') ? <span className="text-black">{loja.nome}</span> : <span>{loja.nome}</span>}
                   </div>
                   
