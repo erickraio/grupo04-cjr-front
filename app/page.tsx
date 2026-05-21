@@ -13,8 +13,8 @@ const categorias = [
   { id: 4, nome: "Moda", imagem: "/moda-token.png" },
   { id: 5, nome: "Eletrônicos", imagem: "/eletronico-token.png" },
   { id: 6, nome: "Jogos", imagem: "/jogos-token.png" },
-  { id: 7, nome: "Brinquedos", imagem: "/brinquedo-token.png" },
-  { id: 8, nome: "Casa", imagem: "/casa-token.png" },
+  { id: 7, nome: "Brinquedos", imagem: "/brinquedos-token.png" },
+  { id: 8, nome: "Casa", imagem: "/casas-token.png" },
 ];
 
 const produtosAvaliados = [
@@ -109,7 +109,6 @@ export default function Home() {
         <div>
             <h2 className="text-2xl font-bold text-black mb-6">Categoria</h2>
             
-            {/* Atualizado com os mesmos paddings (pb-6 pt-2) e scrollbar-hide para manter o padrão */}
             <div className="flex gap-4 md:gap-8 overflow-x-auto pb-6 pt-2 scrollbar-hide">
                {categorias.map((categoria) => (
                  <div key={categoria.id} className="flex flex-col items-center gap-4 min-w-[104px] cursor-pointer group">
@@ -265,4 +264,6 @@ function CardProduto({ data }: { data: any }) {
     </div>
   );
 
+  
 }
+
