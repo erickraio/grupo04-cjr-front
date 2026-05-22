@@ -77,7 +77,7 @@ export default function ProdutosEspecificos() {
 
                         {/* Seta de voltar + coluna de thumbnails */}
                         <div className="flex flex-col items-center gap-3">
-                            
+
                             {thumbnails.map((src, i) => (
                                 <button
                                     key={i}
@@ -184,16 +184,21 @@ export default function ProdutosEspecificos() {
                                         </div>
                                         <p className="font-bold text-xl text-gray-900">{avaliacao.nome}</p>
                                     </div>
-                                    <div className="flex gap-1 text-yellow-400">
-                                        {Array.from({ length: avaliacao.nota }).map((_, index) => (
-                                            <Image
-                                                key={index}
-                                                src="/images/estrela2.png"
-                                                alt="Estrela"
-                                                width={22}
-                                                height={22}
-                                            />
-                                        ))}
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex gap-1">
+                                            {Array.from({ length: avaliacao.nota }).map((_, index) => (
+                                                <Image
+                                                    key={index}
+                                                    src="/images/estrela2.png"
+                                                    alt="Estrela"
+                                                    width={22}
+                                                    height={22}
+                                                />
+                                            ))}
+                                        </div>
+                                        <button className="w-[27px] h-[27px] bg-[#fcfbf7] rounded-full flex items-center justify-center">
+                                            <Image src="/images/lapis2.png" alt="Editar" width={17} height={17} />
+                                        </button>
                                     </div>
                                 </div>
                                 <p className="text-gray-700 text-lg pointer-events-auto">{avaliacao.comentario}</p>
