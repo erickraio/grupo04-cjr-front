@@ -6,6 +6,7 @@ const api = axios.create({
   baseURL: 'http://localhost:3001/',
 });
 
+
 export const registerUser = async (userData: any) => {
     try {
         const response = await api.post('/user/register', userData);
