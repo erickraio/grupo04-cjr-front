@@ -1,46 +1,70 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
-import { ChevronLeft, Mail, Plus, Star } from 'lucide-react';
+import React, { useEffect, useState, Suspense, useRef } from 'react';
+import { ChevronLeft, Mail, Plus, Star, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Navbar from '../components/navbar';
-
+import Image from 'next/image';
+import cameraImg from '../../public/camera.png';
+function CameraIcon() {
+  return (
+    <Image 
+      src={cameraImg} 
+      alt="Ícone de Câmera" 
+      className="w-6 h-6 object-contain"
+    />
+  );
+}
 function PerfilContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
-
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editNome, setEditNome] = useState('');
+  const [editUsername, setEditUsername] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editFotoUrl, setEditFotoUrl] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   useEffect(() => {
     async function fetchPerfil() {
       try {
         const token = localStorage.getItem("@StockIO:token");
-        if (!token) {
+        const urlId = searchParams.get('id');
+        if (!token && !urlId) {
           router.push('/login');
           return;
         }
-
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const loggedInUserId = payload.sub || payload.id;
-
-        const urlId = searchParams.get('id');
-        const targetUserId = urlId ? parseInt(urlId) : loggedInUserId;
-
-        setIsOwner(targetUserId === loggedInUserId);
-
-        const response = await fetch(`http://localhost:3001/user/${targetUserId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
+        let loggedInUserId = null;
+        if (token) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            loggedInUserId = payload.sub || payload.id;
+          } catch (jwtError) {
+            console.error("Erro ao decodificar token antigo/inválido:", jwtError);
+            localStorage.removeItem("@StockIO:token");
           }
-        });
-
+        }
+        const targetUserId = urlId ? parseInt(urlId) : loggedInUserId;
+        if (!targetUserId) {
+          router.push('/login');
+          return;
+        }
+        setIsOwner(loggedInUserId !== null && targetUserId === loggedInUserId);
+        const headers: HeadersInit = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        const response = await fetch(`http://localhost:3001/user/${targetUserId}`, { headers });
         if (!response.ok) throw new Error("Usuário não encontrado");
-        
         const data = await response.json();
         setUserData(data);
-
+        setEditNome(data.nome || '');
+        setEditUsername(data.username || '');
+        setEditEmail(data.email || '');
+        setEditFotoUrl(data.foto_perfil_url || '');
       } catch (error) {
         console.error("Erro ao carregar perfil:", error);
         setUserData(null);
@@ -48,69 +72,103 @@ function PerfilContent() {
         setLoading(false);
       }
     }
-
     fetchPerfil();
   }, [router, searchParams]);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setEditFotoUrl(URL.createObjectURL(file));
+    }
+  };
+const handleSaveProfile = async () => {
+  try {
+    const token = localStorage.getItem("@StockIO:token");
+    if (!token) {
+      alert("Sua sessão expirou. Faça login novamente.");
+      router.push('/login');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('name', editNome);
+    formData.append('username', editUsername);
+    formData.append('email', editEmail);
+        if (selectedFile) {
+      formData.append('foto_perfil', selectedFile);
+    }
+    const response = await fetch(`http://localhost:3001/user/${userData.id}`, {
+      method: 'PATCH', 
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Erro ao atualizar perfil");
+    }
+
+    const updatedUser = await response.json();
+    setUserData(updatedUser);
+    setIsEditModalOpen(false);
+    setSelectedFile(null);
+    alert("Perfil atualizado com sucesso!");
+
+  } catch (err: any) {
+    console.error("Erro ao salvar perfil:", err);
+    alert(err.message || "Não foi possível salvar as alterações.");
+  }
+};
   if (loading) return <div className="min-h-screen bg-[#f6f3e4] flex items-center justify-center font-bold text-black">Carregando perfil...</div>;
   if (!userData) return <div className="min-h-screen bg-[#f6f3e4] flex items-center justify-center font-bold text-black">Usuário não encontrado.</div>;
-
   const lojas = userData.lojas || [];
   const produtos = lojas.flatMap((loja: any) => loja.produtos || []); 
-  
-  const avaliacoesProduto = userData.avaliacoes_produto || [];
-  const avaliacoesLoja = userData.avaliacoes_loja || [];
-  const todasAvaliacoes = [...avaliacoesProduto, ...avaliacoesLoja];
-
+  const todasAvaliacoes = [...(userData.avaliacoes_produto || []), ...(userData.avaliacoes_loja || [])];
   return (
-    <div className="min-h-screen w-full bg-[#f6f3e4] font-sans pb-20">
-      
-      {/* NAVBAR */}
+    <div className="min-h-screen w-full bg-[#f6f3e4] font-sans pb-20 relative">
       <Navbar />
-
       {/* HEADER PRETO */}
       <div className="h-[200px] bg-black w-full relative flex items-center px-10">
         <button onClick={() => router.back()} className="text-white hover:text-gray-300 transition-colors">
           <ChevronLeft size={40} strokeWidth={1.5} />
         </button>
       </div>
+      {/* ÁREA DO PERFIL */}
+      <div className="max-w-6xl mx-auto px-10 relative">
 
-      {/* ÁREA DO PERFIL (Foto e Infos) */}
-      <div className="max-w-6xl mx-auto px-10 relative -mt-24">
-        
-        <div className="flex flex-col md:flex-row justify-between md:items-end mb-12">
-          
-          {/* Esquerda: Foto e Textos */}
-          <div className="flex flex-col">
-            {/* Foto de Perfil */}
-            <div className="w-48 h-48 rounded-full border-[6px] border-[#f6f3e4] overflow-hidden bg-gray-300 shadow-md z-10 shrink-0">
-              <img 
-                src={userData.foto_perfil_url || "/default-avatar.png"} 
-                alt={userData.nome} 
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Informações de Texto */}
-            <div className="mt-4">
-              <h1 className="text-5xl font-bold text-black tracking-tight">{userData.nome}</h1>
-              <p className="text-gray-600 text-xl mt-1">@{userData.username}</p>
-              <div className="flex items-center gap-2 text-gray-500 mt-2">
-                <Mail size={18} />
-                <span className="text-lg">{userData.email}</span>
-              </div>
+        {/* Foto de Perfil */}
+        <div className="absolute -top-24 left-10 z-10">
+          <div className="w-48 h-48 rounded-full border-4 border-[#f6f3e4] overflow-hidden bg-gray-300 shadow-md">
+            <img 
+              src={userData.foto_perfil_url || "/default-avatar.png"} 
+              alt={userData.nome} 
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+        {/* Informações de Texto e Botão de Editar */}
+        <div className="pt-32 pb-12 relative flex justify-between items-start">
+          <div>
+            <h1 className="text-5xl font-bold text-black tracking-tight">{userData.nome}</h1>
+            <p className="text-gray-600 text-xl mt-1">@ {userData.username}</p>
+            <div className="flex items-center gap-2 text-gray-500 mt-2">
+              <Mail size={18} />
+              <span className="text-lg">{userData.email}</span>
             </div>
           </div>
 
-          {/* Direita: Botão de Editar Perfil */}
           {isOwner && (
-            <div className="mt-6 md:mt-0 md:pb-6 flex items-end">
-              <button className="bg-[#7c3aed] text-white px-8 py-3 rounded-full font-semibold hover:bg-purple-700 transition-colors shadow-md cursor-pointer">
-                Editar Perfil
-              </button>
-            </div>
+            <button 
+              onClick={() => setIsEditModalOpen(true)}
+              className="bg-[#7c3aed] text-white px-8 py-2 rounded-full font-semibold hover:bg-purple-700 transition-colors"
+            >
+              Editar Perfil
+            </button>
           )}
         </div>
+
+        {/* PRODUTOS */}
         {produtos.length > 0 && (
           <div className="mb-14">
             <h2 className="text-3xl font-bold text-black mb-6">Produtos</h2>
@@ -135,7 +193,7 @@ function PerfilContent() {
           </div>
         )}
 
-        {/* SEÇÃO: LOJAS */}
+        {/* LOJAS */}
         {(lojas.length > 0 || isOwner) && (
           <div className="mb-14">
             <div className="flex justify-between items-center mb-6">
@@ -166,7 +224,7 @@ function PerfilContent() {
           </div>
         )}
 
-        {/* SEÇÃO: AVALIAÇÕES */}
+        {/* AVALIAÇÕES */}
         {todasAvaliacoes.length > 0 && (
           <div>
             <h2 className="text-3xl font-bold text-black mb-6">Avaliações</h2>
@@ -200,8 +258,86 @@ function PerfilContent() {
             </div>
           </div>
         )}
-
       </div>
+      {/* MODAL DE EDITAR PERFIL (Renderizado condicionalmente) */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#f3f0e0] w-full max-w-md rounded-[32px] p-8 relative shadow-2xl border border-gray-200 mx-4">
+            
+            {/* Botão Fechar */}
+            <button 
+              onClick={() => setIsEditModalOpen(false)} 
+              className="absolute top-6 right-6 text-black hover:opacity-60 transition-opacity"
+            >
+              <X size={24} />
+            </button>
+
+            {/* Input de Arquivo Escondido */}
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
+
+            {/* Avatar Central com Botão de Câmera */}
+            <div className="flex flex-col items-center mb-8 relative">
+              <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-gray-300 shadow-md relative group">
+                <img 
+                  src={editFotoUrl || "/default-avatar.png"} 
+                  alt="Pré-visualização" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-[-12px] bg-white p-3 rounded-full shadow-md hover:scale-105 transition-transform border border-gray-100 flex items-center justify-center"
+              >
+                <CameraIcon />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <input 
+                type="text" 
+                placeholder="Nome"
+                value={editNome}
+                onChange={(e) => setEditNome(e.target.value)}
+                className="w-full bg-[#e8e5d5] placeholder-gray-500 text-black px-6 py-4 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#7c3aed]/20 transition-all font-medium"
+              />
+              <input 
+                type="text" 
+                placeholder="Username"
+                value={editUsername}
+                onChange={(e) => setEditUsername(e.target.value)}
+                className="w-full bg-[#e8e5d5] placeholder-gray-500 text-black px-6 py-4 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#7c3aed]/20 transition-all font-medium"
+              />
+              <input 
+                type="email" 
+                placeholder="Email"
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+                className="w-full bg-[#e8e5d5] placeholder-gray-500 text-black px-6 py-4 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#7c3aed]/20 transition-all font-medium"
+              />
+            </div>
+            <div className="mt-8 space-y-3">
+              <button className="w-full py-3 border border-red-500 text-red-600 rounded-full font-semibold hover:bg-red-50 transition-colors">
+                Deletar conta
+              </button>
+              <button className="w-full py-3 border border-purple-500 text-purple-600 rounded-full font-semibold hover:bg-purple-50 transition-colors">
+                Alterar senha
+              </button>
+              <button 
+                onClick={handleSaveProfile}
+                className="w-full py-4 bg-[#7c3aed] text-white rounded-full font-bold shadow-lg hover:bg-purple-700 transition-colors pt-4"
+              >
+                Salvar
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
