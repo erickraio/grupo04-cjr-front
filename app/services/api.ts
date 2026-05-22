@@ -6,6 +6,7 @@ const api = axios.create({
   baseURL: 'http://localhost:3001/',
 });
 
+////Usuario /////
 export const registerUser = async (userData: any) => {
     try {
         const response = await api.post('/user/register', userData);
@@ -14,6 +15,9 @@ export const registerUser = async (userData: any) => {
         throw error.response?.data || {message: "Erro ao registrar usuário"};
     }
 };
+
+
+
 
 export default api;
 
