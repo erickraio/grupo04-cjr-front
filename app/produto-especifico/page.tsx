@@ -4,14 +4,15 @@ import { useRef, useState } from "react";
 import Navbar from "../components/navbar";
 import Image from "next/image";
 
-
+const usuarioLogadoId = 1;
 //Dados de teste:
 const avaliacoes = [
-    { id: 1, nome: "Selena Gomez", nota: 5, comentario: "Não é por nada não, mas essa garota arrasa!", img: "/images/rosto.png" },
-    { id: 2, nome: "Sofia Figueiredo", nota: 5, comentario: "Adorei o produto. Funcionou muito na minha pele.", img: "/images/rosto.png" },
-    { id: 3, nome: "Pedro Freitas", nota: 4, comentario: "A qualidade é incrível.", img: "/images/rosto.png" },
-    { id: 4, nome: "Sofia", nota: 5, comentario: "Muito bom", img: "/images/rosto.png" },
-    { id: 5, nome: "Sofia", nota: 5, comentario: "Produto de qualidade!", img: "/images/rosto.png" },
+   
+    { id: 1, id_usuario: 1, nome: "Selena Gomez", nota: 5, comentario: "Não é por nada não, mas essa garota arrasa!", img: "/images/rosto.png" },
+    { id: 2, id_usuario: 2, nome: "Sofia Figueiredo", nota: 5, comentario: "Adorei o produto. Funcionou muito na minha pele.", img: "/images/rosto.png" },
+    { id: 3, id_usuario: 3, nome: "Pedro Freitas", nota: 4, comentario: "A qualidade é incrível.", img: "/images/rosto.png" },
+    { id: 4, id_usuario: 4, nome: "Sofia", nota: 5, comentario: "Muito bom", img: "/images/rosto.png" },
+    { id: 5, id_usuario: 5, nome: "Sofia", nota: 5, comentario: "Produto de qualidade!", img: "/images/rosto.png" },
 ];
 
 // Thumbnails do produto principal
@@ -196,9 +197,11 @@ export default function ProdutosEspecificos() {
                                                 />
                                             ))}
                                         </div>
+                                          {/* Lápis: só aparece se o usuário logado for o dono do comentário */}
+                                        {usuarioLogadoId === avaliacao.id_usuario && (
                                         <button className="w-[27px] h-[27px] bg-[#fcfbf7] rounded-full flex items-center justify-center">
                                             <Image src="/images/lapis2.png" alt="Editar" width={17} height={17} />
-                                        </button>
+                                        </button>)}
                                     </div>
                                 </div>
                                 <p className="text-gray-700 text-lg pointer-events-auto">{avaliacao.comentario}</p>
