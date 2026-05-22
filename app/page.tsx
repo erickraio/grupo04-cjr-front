@@ -5,7 +5,7 @@ export default function Home() {
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col gap-10">
       
       {/* Aqui a gente chama a sua Navbar como DESLOGADO para testar */}
-      <Navbar logado={false} />
+      <Navbar/>
 
       {/* Um conteúdo bobo no meio da tela só para não ficar vazio */}
       <main className="flex-1 flex flex-col items-center justify-center">
