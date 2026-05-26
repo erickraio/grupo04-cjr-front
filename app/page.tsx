@@ -119,7 +119,7 @@ export default function Home() {
           
           {/* Barra de Pesquisa */}
           <div className="flex flex-col items-end w-full gap-2">
-            <Searchbar onSearch={handleSearch} />
+            <Searchbar onSearch={handleSearch} produtos={produtosFiltrados} />
             {carregando && <span className="text-sm text-[#7C3AED] animate-pulse">Buscando produtos...</span>}
           </div>
 
