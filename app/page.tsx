@@ -15,6 +15,23 @@ export default function Home() {
   const [produtosFiltrados, setProdutosFiltrados] = useState<any[] | null>(null);
   const [carregando,setCarregando] = useState(false);
 
+  // Função para mapear o nome da categoria para o ícone correto
+  const getCategoriaIcone = (nome: string) => {
+    const nomeFormatado = nome.toLowerCase();
+    
+    if (nomeFormatado.includes('mercado')) return '/mercado-token.png';
+    if (nomeFormatado.includes('farmácia') || nomeFormatado.includes('farmacia')) return '/farmacia-token.png';
+    if (nomeFormatado.includes('beleza')) return '/beleza-token.png';
+    if (nomeFormatado.includes('moda')) return '/moda-token.png';
+    if (nomeFormatado.includes('eletrônico') || nomeFormatado.includes('eletronico')) return '/eletronico-token.png';
+    if (nomeFormatado.includes('jogo')) return '/jogos-token.png';
+    if (nomeFormatado.includes('brinquedo')) return '/brinquedos-token.png';
+    if (nomeFormatado.includes('casa')) return '/casas-token.png';
+    
+    // Ícone padrão caso a categoria não tenha imagem específica
+    return '/icon-placeholder.png'; 
+  };
+
   const handleSearch = async (query: string) => {
     if (!query.trim()) {
       setProdutosFiltrados(null);
@@ -108,27 +125,28 @@ export default function Home() {
             {carregando && <span className="text-sm text-[#7C3AED] animate-pulse">Buscando produtos...</span>}
           </div>
 
-          {/* Categorias*/}
-        <div>
+          {/* Categorias */}
+          <div>
             <h2 className="text-2xl font-bold text-black mb-6">Categoria</h2>
             
-            <div className="flex gap-4 md:gap-8 overflow-x-auto pb-6 pt-2 scrollbar-hide">
+            <div className="flex gap-4 md:gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
                {categorias.map((categoria: any) => (
-                 <div key={categoria.id} className="flex flex-col items-center gap-4 min-w-[104px] cursor-pointer group">
+                 <div key={categoria.id} className="flex flex-col items-center gap-3 min-w-[110px] cursor-pointer group">
                     
-                    <div className="w-[104px] h-[92px] bg-white rounded-3xl flex items-center justify-center shadow-[0px_4px_12px_rgba(0,0,0,0.03)] border border-transparent group-hover:border-indigo-100 transition-colors">
+                    {/* Quadrado Branco do Ícone */}
+                    <div className="w-[100px] h-[100px] bg-white rounded-[2rem] flex items-center justify-center shadow-[0px_4px_15px_rgba(0,0,0,0.03)] border border-transparent group-hover:border-indigo-100 transition-colors">
                       <Image 
-                        src="/icon-placeholder.png" 
+                        src={getCategoriaIcone(categoria.nome)} 
                         alt={`Ícone ${categoria.nome}`} 
-                        width={40} 
-                        height={40} 
-                        style={{ width: 'auto', height: 'auto' }}
+                        width={46} 
+                        height={46} 
+                        className="object-contain"
                       />
                     </div>
                     
-                    <span className="text-sm font-semibold text-black">{categoria.nome}</span>
+                    {/* Nome da Categoria */}
+                    <span className="text-[15px] font-semibold text-black">{categoria.nome}</span>
                  </div>
-                 
                ))}
             </div>
           </div>
@@ -220,7 +238,6 @@ function CardProduto({ data }: { data: any }) {
           {isDisponivel ? 'DISPONÍVEL' : 'INDISPONÍVEL'}
         </span>
       </div>
-
     </div>
   );
 }
