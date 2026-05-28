@@ -229,8 +229,12 @@ const handleSaveProfile = async () => {
           <div>
             <h2 className="text-3xl font-bold text-black mb-6">Avaliações</h2>
             <div className="flex flex-col gap-5">
-              {todasAvaliacoes.map((av: any) => (
-                <div key={av.id} className="bg-white rounded-3xl p-6 shadow-sm flex gap-6 border border-gray-100">
+              {todasAvaliacoes.filter((av, index, self) =>
+                index === self.findIndex((t) =>
+                  t.id === av.id && !!t.id_loja === !!av.id_loja
+                )
+              ).map((av: any) => (
+                <div key={av.id_loja ? `loja-${av.id}` : `produto-${av.id}`} className="bg-white rounded-3xl p-6 shadow-sm flex gap-6 border border-gray-100">
                   <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 bg-gray-200 border-2 border-white shadow-sm">
                      <img src={userData.foto_perfil_url || "/default-avatar.png"} alt={userData.nome} className="w-full h-full object-cover" />
                   </div>
