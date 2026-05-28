@@ -254,7 +254,6 @@ function CardProduto({ data }: { data: any }) {
     <div className="bg-white rounded-3xl p-4 md:p-5 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] flex flex-col relative border border-transparent hover:border-gray-200 transition-all cursor-pointer">
       
       {/* Aqui a gente chama a sua Navbar como DESLOGADO para testar */}
-      <Navbar/>
       {/* Selo (Badge) Redondo da Loja no Canto Superior Direito */}
       <div className="absolute -top-3 -right-3 w-12 h-12 bg-black rounded-full border-4 border-white flex items-center justify-center z-10 shadow-sm overflow-hidden text-[10px] text-white font-bold text-center">
         {/* Futuramente: <Image src={data.lojaLogoUrl} ... /> */}
