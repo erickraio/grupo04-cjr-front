@@ -41,7 +41,7 @@ export default function Cadastro() {
 
     return (
         <div className="bg-[#f6f3e4] min-h-screen flex items-end">
-            <div className="bg-[#000000] h-[90vh] ml-20 rounded-t-[55px] w-4/5">
+            <div className="bg-[#000000] h-[105vh] ml-20 rounded-t-[55px] w-1/2">
                 <h1 className="text-4xl text-[#f6f3e4] text-center font-bold pb-20 pt-20 ">CRIE SUA CONTA</h1>
                 <div className=" text-center">
                 <ul>
@@ -89,10 +89,16 @@ export default function Cadastro() {
                     <p className="text-left w-4/5 mx-auto mt-4">Já possui uma conta? <a href="/login" className="text-[#6a38f3] hover:underline">Faça login</a></p>
                 </div>
             </div>
-            <div className="items-end justify-center overflow-hidden position: relative px-70">
-                <img src="/images/logocadastro.png" alt="Logo Cadastro" className=" w-80 object-cover object-top origin-top"/>
-                <img src="/images/boneca.png" alt="Boneca" className="h-135 w-85 object-cover object-top origin-top"/>
-            </div>
+        <div className="w-1/2 flex flex-col items-center justify-end overflow-hidden relative">
+            <img src="/images/logocadastro.png" alt="Logo Cadastro" className="w-64 mb-8 object-cover object-top origin-top"/>
+            <img 
+                src="/images/mascote_login.png" 
+                alt="mascote"
+                width={512}
+                height={1118}
+                className="h-auto max-h-[85vh] w-auto object-contain" 
+            />
+        </div>
             <div>
             </div>
         </div>
