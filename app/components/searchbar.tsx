@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
+  produtos: any[] | null;
 }
 
 export default function SearchBar({onSearch}: SearchBarProps) {

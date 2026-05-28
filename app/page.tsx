@@ -1,5 +1,9 @@
+'use client';
 import Navbar from "./components/navbar";
 import Image from "next/image";
+import {useState} from "react";
+import Searchbar from "./components/searchbar";
+import axios from "axios";
 
 // ==========================================
 // MOCK DATA: Dados preparados para o Backend
@@ -59,6 +63,28 @@ const lojas = [
 // ==========================================
 
 export default function Home() {
+  const [produtosFiltrados, setProdutosFiltrados] = useState<any[] | null>(null);
+  const [carregando,setCarregando] = useState(false);
+
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      setProdutosFiltrados(null);
+      return;
+    }
+    setCarregando(true);
+    try {
+      const response = await axios.get(`http://localhost:3001/produtos?busca=${(query)}`);
+      setProdutosFiltrados(response.data);
+      console.log("Busca realizada com sucesso:", response.data);
+      console.log("Termo pesquisado:", query);
+      console.log("Produtos retornados:", response.data);
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+    } finally {
+      setCarregando(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[#F6F5ED]">
 
@@ -92,17 +118,9 @@ export default function Home() {
         <div className="max-w-6xl w-full flex flex-col gap-12">
           
           {/* Barra de Pesquisa */}
-          <div className="flex justify-end w-full">
-            <div className="relative w-full md:w-[450px]">
-              <input 
-                type="text" 
-                placeholder="Procurar por..." 
-                className="w-full pl-6 pr-12 py-3 rounded-full bg-white text-gray-400 placeholder:text-gray-300 focus:outline-none shadow-[0px_2px_8px_rgba(0,0,0,0.04)]"
-              />
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute right-5 top-1/2 -translate-y-1/2 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
+          <div className="flex flex-col items-end w-full gap-2">
+            <Searchbar onSearch={handleSearch} produtos={produtosFiltrados} />
+            {carregando && <span className="text-sm text-[#7C3AED] animate-pulse">Buscando produtos...</span>}
           </div>
 
           {/* Categorias*/}
@@ -235,8 +253,6 @@ function CardProduto({ data }: { data: any }) {
   return (
     <div className="bg-white rounded-3xl p-4 md:p-5 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] flex flex-col relative border border-transparent hover:border-gray-200 transition-all cursor-pointer">
       
-      {/* Aqui a gente chama a sua Navbar como DESLOGADO para testar */}
-      <Navbar/>
       {/* Selo (Badge) Redondo da Loja no Canto Superior Direito */}
       <div className="absolute -top-3 -right-3 w-12 h-12 bg-black rounded-full border-4 border-white flex items-center justify-center z-10 shadow-sm overflow-hidden text-[10px] text-white font-bold text-center">
         {/* Futuramente: <Image src={data.lojaLogoUrl} ... /> */}
