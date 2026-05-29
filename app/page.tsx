@@ -217,7 +217,9 @@ export default function Home() {
 
 function CardProduto({ data }: { data: any }) {
   // Ajustando para os nomes prováveis do backend (banco de dados)
-  const isDisponivel = data.quantidade > 0; // Exemplo: se tem quantidade, está disponível
+  const isDisponivel = data.estoque > 0; // Exemplo: se tem quantidade, está disponível
+
+  const urlImagem = data?.imagens?.[0]?.url_imagem || '/images/steamdeck.png'; // Imagem do produto ou placeholder
   
   return (
      <Link href={`/produto-especifico/${data.id}`}> 
@@ -225,7 +227,7 @@ function CardProduto({ data }: { data: any }) {
       
       {/* Área da Imagem do Produto (Espaço Disponível) */}
       <div className="relative w-full h-[160px] bg-gray-50 rounded-2xl mb-4 flex items-center justify-center text-gray-300 text-xs mt-4">
-         <span>Imagem: {data.nome}</span>
+         <Image src={urlImagem} alt={data.nome} fill className="object-contain" />
       </div>
 
       {/* Informações de Texto */}

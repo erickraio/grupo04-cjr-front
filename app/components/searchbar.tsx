@@ -42,18 +42,18 @@ export default function SearchBar({ onSearch, produtos }: SearchBarProps) {
                     ) : (
                         produtos.map((item: any) => (
                             <Link key={item.id} href={`/produto-especifico/${item.id}`}>
-                                <div
+                                <span
                                     className="flex justify-between items-center p-2 hover:bg-gray-50 rounded-md cursor-pointer transition-colors"
                                 >
-                                    <div>
+                                    <span>
                                         <span className="text-sm font-medium text-black">{item.nome} - </span>
                                         {item.loja && (
                                             <span className="text-sm font-medium text-black">Vendido por: {item.loja.nome}</span>
                                         )}
-                                    </div>
+                                    </span>
                                     <span className="text-xs font-bold text-[#6a38f3]">R${item.preco.toFixed(2).replace('.', ',')}
                                     </span>
-                                </div>
+                                </span>
                             </Link>
                         ))
                     )}
