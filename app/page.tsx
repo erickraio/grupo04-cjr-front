@@ -9,6 +9,7 @@ import Image from "next/image";
 // COMPONENTE PRINCIPAL (PÁGINA)import {useState} from "react";
 import Searchbar from "./components/searchbar";
 import axios from "axios";
+import Link from "next/link";
 // ==========================================
 
 export default function Home() {
@@ -219,6 +220,7 @@ function CardProduto({ data }: { data: any }) {
   const isDisponivel = data.quantidade > 0; // Exemplo: se tem quantidade, está disponível
   
   return (
+     <Link href={`/produto-especifico/${data.id}`}> 
     <div className="bg-white rounded-3xl p-4 md:p-5 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] flex flex-col relative border border-transparent hover:border-gray-200 transition-all cursor-pointer">
       
       {/* Área da Imagem do Produto (Espaço Disponível) */}
@@ -239,5 +241,6 @@ function CardProduto({ data }: { data: any }) {
         </span>
       </div>
     </div>
+    </Link>
   );
 }
