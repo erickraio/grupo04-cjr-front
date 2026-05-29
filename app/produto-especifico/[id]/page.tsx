@@ -4,9 +4,11 @@ import { useRef, useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Navbar from "../../components/navbar";
 import Image from "next/image";
+import {useRouter} from "next/navigation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const IMAGE_FALLBACK = "/images/brownie.png"; // Imagem padrão se o banco estiver vazio
+
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -51,6 +53,7 @@ type Avaliacao = {
 };
 
 export default function ProdutosEspecificos() {
+  const router = useRouter();
   const params = useParams();
   const PRODUTO_ID = Number(params?.id) || 7; /// coloque um id default para achar um produto enquanto não tem conexão com a pagina inicial
 
@@ -291,10 +294,18 @@ export default function ProdutosEspecificos() {
               className={`flex flex-row gap-6 overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] select-none ${isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x"}`}
             >
               {produtosMesmaLoja.map((p) => (
-                <div key={p.id} className="pointer-events-none min-w-[220px] snap-start">
-                  <CardProduto data={p} />
-                </div>
-              ))}
+            <div 
+                key={p.id} 
+                className="min-w-[220px] snap-start cursor-pointer"
+                onClick={() => {
+                if (!isDragging) {
+                  router.push(`/produto-especifico/${p.id}`);
+                }
+              }}
+            >
+            <CardProduto data={p} />
+            </div>
+            ))} 
             </div>
           </div>
         )}
