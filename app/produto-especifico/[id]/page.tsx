@@ -55,7 +55,7 @@ type Avaliacao = {
 export default function ProdutosEspecificos() {
   const router = useRouter();
   const params = useParams();
-  const PRODUTO_ID = Number(params?.id) || 7; /// coloque um id default para achar um produto enquanto não tem conexão com a pagina inicial
+  const PRODUTO_ID = Number(params?.id) || 7; 
 
   const avaliacoesRef = useRef(null);
   const lojaRef = useRef(null);
