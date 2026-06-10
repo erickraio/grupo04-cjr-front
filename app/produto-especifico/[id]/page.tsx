@@ -4,11 +4,13 @@ import { useRef, useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Navbar from "../../components/navbar";
 import Image from "next/image";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
+import ModalEditarAvaliacao from "../../components/ModalEditarAvaliacao";
+import ModalCriarProduto from "@/app/components/ModalCriarProduto";
+import ModalCriarAvaliacao from "@/app/components/ModalCriarAvaliacao";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-const IMAGE_FALLBACK = "/images/brownie.png"; // Imagem padrão se o banco estiver vazio
-
+const IMAGE_FALLBACK = "/images/brownie.png";
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -26,10 +28,9 @@ function getUserIdFromToken(): number | null {
   }
 }
 
-
 type ImagemProduto = {
   id: number;
- url_imagem: string;
+  url_imagem: string;
   id_produto: number;
 };
 
@@ -41,7 +42,7 @@ type Produto = {
   estoque: number;
   id_loja: number;
   categoria?: { nome: string };
-  imagens?: ImagemProduto[]; // Módulo de imagens acoplado via include
+  imagens?: ImagemProduto[];
 };
 
 type Avaliacao = {
@@ -49,13 +50,13 @@ type Avaliacao = {
   id_usuario: number;
   nota: number;
   comentario?: string;
-  usuario?: { nome: string; username: string; foto_perfil_url:string };
+  usuario?: { nome: string; username: string; foto_perfil_url: string };
 };
 
 export default function ProdutosEspecificos() {
   const router = useRouter();
   const params = useParams();
-  const PRODUTO_ID = Number(params?.id) || 7; 
+  const PRODUTO_ID = Number(params?.id) || 7;
 
   const avaliacoesRef = useRef(null);
   const lojaRef = useRef(null);
@@ -65,23 +66,20 @@ export default function ProdutosEspecificos() {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  // Dados do banco
   const [produto, setProduto] = useState<Produto | null>(null);
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [produtosMesmaLoja, setProdutosMesmaLoja] = useState<Produto[]>([]);
   const [usuarioLogadoId, setUsuarioLogadoId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Controle dos modais
   const [modalEditarProdutoOpen, setModalEditarProdutoOpen] = useState(false);
-  const [modalEditarEstrelasOpen, setModalEditarEstrelasOpen] = useState(false);
+  const [modalAvaliarOpen, setModalAvaliarOpen] = useState(false);
   const [avaliacaoSelecionada, setAvaliacaoSelecionada] = useState<Avaliacao | null>(null);
 
   useEffect(() => {
     setUsuarioLogadoId(getUserIdFromToken());
     fetchProduto();
     fetchAvaliacoes();
-    // Reinicia o índice da imagem quando o produto mudar
     setSelectedThumb(0);
   }, [PRODUTO_ID]);
 
@@ -147,9 +145,8 @@ export default function ProdutosEspecificos() {
     );
   }
 
-  // 2. Extração das imagens reais do produto (se não houver nenhuma, usa o array padrão)
-  const listaImagens = produto?.imagens && produto.imagens.length > 0
-    ? produto.imagens.map(img => img.url_imagem)
+ const listaImagens = produto?.imagens && produto.imagens.length > 0
+    ? produto.imagens.map(img => `${API_URL}${img.url_imagem}`)
     : [IMAGE_FALLBACK];
 
   return (
@@ -160,9 +157,7 @@ export default function ProdutosEspecificos() {
 
         {/* Bloco 1: Produto */}
         <div className="flex flex-col md:flex-row gap-12">
-
           <div className="flex flex-row gap-4 h-[420px] md:w-1/2">
-            {/* Miniaturas Laterais Dinâmicas */}
             <div className="flex flex-col items-center gap-3 overflow-y-auto pr-1">
               {listaImagens.map((src, i) => (
                 <button
@@ -175,13 +170,12 @@ export default function ProdutosEspecificos() {
               ))}
             </div>
 
-            {/* Imagem de Destaque Dinâmica baseada no Clique */}
             <div className="flex-1 bg-white rounded-3xl shadow-sm relative overflow-hidden flex items-center justify-center">
-              <Image 
-                src={listaImagens[selectedThumb] || IMAGE_FALLBACK} 
-                alt="Produto principal" 
-                fill 
-                className="object-contain p-4" 
+              <Image
+                src={listaImagens[selectedThumb] || IMAGE_FALLBACK}
+                alt="Produto principal"
+                fill
+                className="object-contain p-4"
               />
               <div className="absolute top-4 right-4 w-[52px] h-[52px] rounded-full overflow-hidden shadow-md border-2 border-white z-10">
                 <Image src="/images/cjr.png" alt="Logo CJR" width={52} height={52} className="w-full h-full object-cover" />
@@ -200,7 +194,7 @@ export default function ProdutosEspecificos() {
                   <Image src="/images/lapis1.png" alt="lapis" width={17} height={17} />
                 </button>
                 <button
-                  onClick={() => setModalEditarEstrelasOpen(true)}
+                  onClick={() => setModalAvaliarOpen(true)}
                   className="w-[27px] h-[27px] bg-[#C6E700] rounded-full flex items-center justify-center hover:opacity-80 transition"
                 >
                   <Image src="/images/estrela3.png" alt="estrela3" width={16} height={16} />
@@ -233,7 +227,6 @@ export default function ProdutosEspecificos() {
         {/* Bloco de Avaliações */}
         <div className="flex flex-col mt-20 gap-6">
           <h2 className="text-3xl font-extrabold text-gray-900">Avaliações</h2>
-
           <div
             ref={avaliacoesRef}
             onMouseDown={(e) => startDragging(e, avaliacoesRef)}
@@ -294,34 +287,56 @@ export default function ProdutosEspecificos() {
               className={`flex flex-row gap-6 overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] select-none ${isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x"}`}
             >
               {produtosMesmaLoja.map((p) => (
-            <div 
-                key={p.id} 
-                className="min-w-[220px] snap-start cursor-pointer"
-                onClick={() => {
-                if (!isDragging) {
-                  router.push(`/produto-especifico/${p.id}`);
-                }
-              }}
-            >
-            <CardProduto data={p} />
-            </div>
-            ))} 
+                <div
+                  key={p.id}
+                  className="min-w-[220px] snap-start cursor-pointer"
+                  onClick={() => {
+                    if (!isDragging) {
+                      router.push(`/produto-especifico/${p.id}`);
+                    }
+                  }}
+                >
+                  <CardProduto data={p} />
+                </div>
+              ))}
             </div>
           </div>
         )}
+
       </div>
 
-      {/* MODAIS (Ocultos até serem importados) */}
+      
+      <ModalEditarAvaliacao
+        isOpen={avaliacaoSelecionada !== null}
+        onClose={() => setAvaliacaoSelecionada(null)}
+        nomeLoja={produto?.nome}
+        notaAtual={avaliacaoSelecionada?.nota ?? 0}
+        textoAtual={avaliacaoSelecionada?.comentario ?? ""}
+      />
+
+      <ModalCriarProduto 
+        isOpen={modalEditarProdutoOpen}
+        onClose={() => setModalEditarProdutoOpen(false)}
+        idLoja={produto?.id_loja ?? 0}
+        onProdutoCriado={fetchProduto}
+      />
+      <ModalCriarAvaliacao
+
+       isOpen={modalAvaliarOpen}
+        onClose={() => setModalAvaliarOpen(false)}
+        idProduto={PRODUTO_ID}
+        onAvaliacaoCriada={fetchProduto}
+      />
+
+   
+
     </div>
   );
 }
 
-// 3. Componente CardProduto atualizado com imagem dinâmica do banco
 function CardProduto({ data }: { data: Produto }) {
   const isDisponivel = data.estoque > 0;
-  
-  // Pega a primeira imagem do array do banco se existir, caso contrário usa a padrão
-  const imagemCard = data.imagens && data.imagens.length > 0 
+  const imagemCard = data.imagens && data.imagens.length > 0
     ? data.imagens[0].url_imagem
     : IMAGE_FALLBACK;
 
@@ -331,11 +346,11 @@ function CardProduto({ data }: { data: Produto }) {
         <Image src="/images/cjr.png" alt="Logo cjr" width={48} height={48} className="w-full h-full object-cover" />
       </div>
       <div className="w-full h-36 bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center relative">
-        <Image 
-          src={imagemCard} 
-          alt={data.nome} 
+        <Image
+          src={imagemCard}
+          alt={data.nome}
           fill
-          className="w-full h-full object-contain p-2" 
+          className="w-full h-full object-contain p-2"
         />
       </div>
       <div className="flex flex-col gap-1 mt-1">

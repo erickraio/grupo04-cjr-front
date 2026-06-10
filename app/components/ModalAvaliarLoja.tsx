@@ -1,44 +1,25 @@
-
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-interface ModalEditarAvaliacaoProps {
+interface ModalAvaliarLojaProps {
   isOpen: boolean;
   onClose: () => void;
-  nomeLoja?: string;
-  // Propriedades preparadas para receber a avaliação já existente do banco de dados
-  notaAtual?: number;
-  textoAtual?: string;
+  nomeLoja?: string; // Permite que a tela da loja envie o nome dela dinamicamente
 }
 
-export default function ModalEditarAvaliacao({ 
-  isOpen, 
-  onClose, 
-  nomeLoja = "Rare Beauty",
-  notaAtual = 0,
-  textoAtual = ""
-}: ModalEditarAvaliacaoProps) {
-  
-  // Estados para as estrelas e texto
-  const [rating, setRating] = useState(notaAtual);
+export default function ModalAvaliarLoja({ isOpen, onClose, nomeLoja = "Rare Beauty" }: ModalAvaliarLojaProps) {
+  // Estado que guarda a nota final clicada
+  const [rating, setRating] = useState(0);
+  // Estado que guarda a nota temporária enquanto o mouse passa por cima
   const [hoverRating, setHoverRating] = useState(0);
-  const [comentario, setComentario] = useState(textoAtual);
-
-  // Garante que a modal sempre abra com os dados atualizados
-  useEffect(() => {
-    if (isOpen) {
-      setRating(notaAtual);
-      setComentario(textoAtual);
-    }
-  }, [isOpen, notaAtual, textoAtual]);
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       
-      {/* Container Principal */}
+      {/* Container Principal da Modal */}
       <div className="bg-[#EBEBEB] w-[90%] max-w-[650px] p-8 md:p-10 rounded-[2rem] shadow-2xl relative">
         
         {/* Botão Fechar (X) */}
@@ -62,6 +43,7 @@ export default function ModalEditarAvaliacao({
         {/* ========================================== */}
         <div className="flex justify-center gap-2 md:gap-4 mb-8">
           {[1, 2, 3, 4, 5].map((star) => {
+            // A estrela deve ser preenchida se o número dela for menor ou igual ao Hover atual ou ao Clique
             const isFilled = star <= (hoverRating || rating);
             
             return (
@@ -73,10 +55,12 @@ export default function ModalEditarAvaliacao({
                 onClick={() => setRating(star)}
                 className="focus:outline-none transition-transform hover:scale-110 cursor-pointer"
               >
+                {/* SVG no formato da sua estrela vazada */}
                 <svg 
                   width="55" 
                   height="55" 
                   viewBox="0 0 24 24" 
+                  // O Tailwind altera o preenchimento (fill) dinamicamente aqui:
                   className={`transition-colors duration-200 ${isFilled ? 'fill-[#7C3AED] text-[#7C3AED]' : 'fill-transparent text-[#7C3AED]'}`}
                   stroke="currentColor" 
                   strokeWidth="1" 
@@ -94,28 +78,21 @@ export default function ModalEditarAvaliacao({
         {/* CAIXA DE TEXTO (TEXTAREA)                  */}
         {/* ========================================== */}
         <textarea 
-          value={comentario}
-          onChange={(e) => setComentario(e.target.value)}
           placeholder="Avaliação da loja" 
           rows={10}
           className="w-full bg-white rounded-2xl p-6 text-sm text-gray-700 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#7C3AED] mb-8"
         />
 
         {/* ========================================== */}
-        {/* BOTÕES EMPILHADOS                          */}
+        {/* BOTÃO AVALIAR                              */}
         {/* ========================================== */}
-        <div className="flex flex-col items-center gap-4">
-          <button className="bg-[#FF0000] w-[70%] text-white font-medium text-sm md:text-base py-3 rounded-full shadow-md hover:bg-red-700 transition-colors cursor-pointer uppercase">
-            Deletar
-          </button>
-          
-          <button className="bg-[#7C3AED] w-[70%] text-white font-medium text-sm md:text-base py-3 rounded-full shadow-md hover:bg-purple-700 transition-colors cursor-pointer">
-            Salvar
+        <div className="flex justify-center">
+          <button className="bg-[#7C3AED] w-[80%] text-white font-medium text-lg py-3.5 rounded-full shadow-md hover:bg-purple-700 transition-colors cursor-pointer">
+            Avaliar
           </button>
         </div>
 
       </div>
     </div>
   );
-
 }

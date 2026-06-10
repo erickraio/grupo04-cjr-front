@@ -6,7 +6,7 @@ import Image from "next/image";
 
 
 // ==========================================
-// COMPONENTE PRINCIPAL (PÁGINA)import {useState} from "react";
+// COMPONENTE PRINCIPAL (PÁGINA)
 import Searchbar from "./components/searchbar";
 import axios from "axios";
 import Link from "next/link";
@@ -89,7 +89,7 @@ export default function Home() {
 
 
   return (
-    <main className="min-h-screen bg-[#F6F5ED]">
+    <main className="min-h-screen bg-[#f6f3e4]">
 
         {/* NAVBAR */}
       <Navbar />
@@ -227,7 +227,7 @@ function CardProduto({ data }: { data: any }) {
       
       {/* Área da Imagem do Produto (Espaço Disponível) */}
       <div className="relative w-full h-[160px] bg-gray-50 rounded-2xl mb-4 flex items-center justify-center text-gray-300 text-xs mt-4">
-         <Image src={urlImagem} alt={data.nome} fill className="object-contain" />
+         <Image loading="eager" src={urlImagem} alt={data.nome} fill className="object-contain" />
       </div>
 
       {/* Informações de Texto */}
