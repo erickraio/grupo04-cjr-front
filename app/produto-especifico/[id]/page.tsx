@@ -1,14 +1,12 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Navbar from "../../components/navbar";
 import Image from "next/image";
-import {useRouter} from "next/navigation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-const IMAGE_FALLBACK = "/images/brownie.png"; // Imagem padrão se o banco estiver vazio
-
+const IMAGE_FALLBACK = "/images/brownie.png"; 
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -26,10 +24,9 @@ function getUserIdFromToken(): number | null {
   }
 }
 
-
 type ImagemProduto = {
   id: number;
- url_imagem: string;
+  url_imagem: string;
   id_produto: number;
 };
 
@@ -41,7 +38,7 @@ type Produto = {
   estoque: number;
   id_loja: number;
   categoria?: { nome: string };
-  imagens?: ImagemProduto[]; // Módulo de imagens acoplado via include
+  imagens?: ImagemProduto[]; 
 };
 
 type Avaliacao = {
@@ -49,39 +46,43 @@ type Avaliacao = {
   id_usuario: number;
   nota: number;
   comentario?: string;
-  usuario?: { nome: string; username: string; foto_perfil_url:string };
+  usuario?: { nome: string; username: string; foto_perfil_url: string };
 };
 
 export default function ProdutosEspecificos() {
   const router = useRouter();
   const params = useParams();
-  const PRODUTO_ID = Number(params?.id) || 7; /// coloque um id default para achar um produto enquanto não tem conexão com a pagina inicial
+  const PRODUTO_ID = Number(params?.id) || 7; 
 
-  const avaliacoesRef = useRef(null);
-  const lojaRef = useRef(null);
+  const avaliacoesRef = useRef<HTMLDivElement>(null);
+  const lojaRef = useRef<HTMLDivElement>(null);
 
   const [selectedThumb, setSelectedThumb] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  // Dados do banco
   const [produto, setProduto] = useState<Produto | null>(null);
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [produtosMesmaLoja, setProdutosMesmaLoja] = useState<Produto[]>([]);
   const [usuarioLogadoId, setUsuarioLogadoId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Controle dos modais
   const [modalEditarProdutoOpen, setModalEditarProdutoOpen] = useState(false);
-  const [modalEditarEstrelasOpen, setModalEditarEstrelasOpen] = useState(false);
-  const [avaliacaoSelecionada, setAvaliacaoSelecionada] = useState<Avaliacao | null>(null);
+  
+  const [modalAvaliacaoOpen, setModalAvaliacaoOpen] = useState(false);
+  const [selectedAvaliacao, setSelectedAvaliacao] = useState<Avaliacao | null>(null);
+  const [modalNota, setModalNota] = useState(0);
+  const [modalComentario, setModalComentario] = useState("");
+
+  const [modalCriarOpen, setModalCriarOpen] = useState(false);
+  const [criarNota, setCriarNota] = useState(0);
+  const [criarComentario, setCriarComentario] = useState("");
 
   useEffect(() => {
     setUsuarioLogadoId(getUserIdFromToken());
     fetchProduto();
     fetchAvaliacoes();
-    // Reinicia o índice da imagem quando o produto mudar
     setSelectedThumb(0);
   }, [PRODUTO_ID]);
 
@@ -120,6 +121,88 @@ export default function ProdutosEspecificos() {
     }
   }
 
+  function abrirModalEdicao(avaliacao: Avaliacao) {
+    setSelectedAvaliacao(avaliacao);
+    setModalNota(avaliacao.nota);
+    setModalComentario(avaliacao.comentario || "");
+    setModalAvaliacaoOpen(true);
+  }
+
+  async function handleSalvarAvaliacao() {
+    if (!selectedAvaliacao) return;
+    const token = getToken();
+    try {
+      const res = await fetch(`${API_URL}/aval-produto/${selectedAvaliacao.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ nota: modalNota, comentario: modalComentario }),
+      });
+
+      if (res.ok) {
+        setModalAvaliacaoOpen(false);
+        fetchAvaliacoes();
+      } else {
+        alert("Erro ao atualizar a avaliação.");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function handleDeletarAvaliacao() {
+    if (!selectedAvaliacao) return;
+    const token = getToken();
+    if (!confirm("Tem certeza que deseja deletar sua avaliação?")) return;
+
+    try {
+      const res = await fetch(`${API_URL}/aval-produto/${selectedAvaliacao.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        setModalAvaliacaoOpen(false);
+        fetchAvaliacoes();
+      } else {
+        alert("Erro ao deletar a avaliação.");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function handleCriarAvaliacao() {
+    if (criarNota === 0) {
+      alert("Por favor, selecione pelo menos uma estrela para avaliar!");
+      return;
+    }
+    const token = getToken();
+    try {
+      const res = await fetch(`${API_URL}/aval-produto/${PRODUTO_ID}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ nota: criarNota, comentario: criarComentario }),
+      });
+
+      if (res.ok) {
+        setModalCriarOpen(false);
+        setCriarNota(0);
+        setCriarComentario("");
+        fetchAvaliacoes();
+      } else {
+        alert("Erro ao criar a avaliação. Você já avaliou este produto?");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   const notaMedia =
     avaliacoes.length > 0
       ? (avaliacoes.reduce((acc, av) => acc + av.nota, 0) / avaliacoes.length).toFixed(1)
@@ -147,7 +230,6 @@ export default function ProdutosEspecificos() {
     );
   }
 
-  // 2. Extração das imagens reais do produto (se não houver nenhuma, usa o array padrão)
   const listaImagens = produto?.imagens && produto.imagens.length > 0
     ? produto.imagens.map(img => img.url_imagem)
     : [IMAGE_FALLBACK];
@@ -156,13 +238,10 @@ export default function ProdutosEspecificos() {
     <div className="bg-[#f6f3e4] min-h-screen pb-12 flex flex-col items-center font-sans">
       <Navbar />
 
-      <div className="w-full mt-16 max-w-[1200px] px-8 flex flex-col gap-16 mt-8">
+      <div className="w-full max-w-[1200px] px-8 flex flex-col gap-16 mt-24">
 
-        {/* Bloco 1: Produto */}
         <div className="flex flex-col md:flex-row gap-12">
-
           <div className="flex flex-row gap-4 h-[420px] md:w-1/2">
-            {/* Miniaturas Laterais Dinâmicas */}
             <div className="flex flex-col items-center gap-3 overflow-y-auto pr-1">
               {listaImagens.map((src, i) => (
                 <button
@@ -175,14 +254,8 @@ export default function ProdutosEspecificos() {
               ))}
             </div>
 
-            {/* Imagem de Destaque Dinâmica baseada no Clique */}
             <div className="flex-1 bg-white rounded-3xl shadow-sm relative overflow-hidden flex items-center justify-center">
-              <Image 
-                src={listaImagens[selectedThumb] || IMAGE_FALLBACK} 
-                alt="Produto principal" 
-                fill 
-                className="object-contain p-4" 
-              />
+              <Image src={listaImagens[selectedThumb] || IMAGE_FALLBACK} alt="Produto principal" fill className="object-contain p-4" />
               <div className="absolute top-4 right-4 w-[52px] h-[52px] rounded-full overflow-hidden shadow-md border-2 border-white z-10">
                 <Image src="/images/cjr.png" alt="Logo CJR" width={52} height={52} className="w-full h-full object-cover" />
               </div>
@@ -200,7 +273,7 @@ export default function ProdutosEspecificos() {
                   <Image src="/images/lapis1.png" alt="lapis" width={17} height={17} />
                 </button>
                 <button
-                  onClick={() => setModalEditarEstrelasOpen(true)}
+                  onClick={() => setModalCriarOpen(true)}
                   className="w-[27px] h-[27px] bg-[#C6E700] rounded-full flex items-center justify-center hover:opacity-80 transition"
                 >
                   <Image src="/images/estrela3.png" alt="estrela3" width={16} height={16} />
@@ -230,7 +303,6 @@ export default function ProdutosEspecificos() {
           </div>
         </div>
 
-        {/* Bloco de Avaliações */}
         <div className="flex flex-col mt-20 gap-6">
           <h2 className="text-3xl font-extrabold text-gray-900">Avaliações</h2>
 
@@ -243,15 +315,24 @@ export default function ProdutosEspecificos() {
             className={`flex flex-row gap-6 overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] select-none ${isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x"}`}
           >
             {avaliacoes.map((avaliacao) => (
-              <div key={avaliacao.id} className="bg-[#fcfbf7] rounded-[2.5rem] p-8 min-w-[450px] shadow-sm snap-start flex flex-col gap-4 border border-gray-100 pointer-events-none">
-                <div className="flex justify-between items-center pointer-events-auto">
+              <div 
+                key={avaliacao.id} 
+                onClick={() => { if (!isDragging) router.push(`/avaliacao/${avaliacao.id}`); }}
+                className="bg-[#fcfbf7] hover:bg-[#f5f4ef] transition-colors rounded-[2.5rem] p-8 min-w-[450px] shadow-sm snap-start flex flex-col gap-4 border border-gray-100 cursor-pointer"
+              >
+                <div className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                      <Image
+                    {/* ROTA DINÂMICA ATUALIZADA AQUI: /perfil/[id] */}
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation(); 
+                        router.push(`/perfil/${avaliacao.id_usuario}`); 
+                      }}
+                      className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 cursor-pointer hover:opacity-80 transition"
+                    >
+                      <img
                         src={avaliacao.usuario?.foto_perfil_url || "/images/rosto.png"}
                         alt={avaliacao.usuario?.nome ?? "usuário"}
-                        width={64}
-                        height={64}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -267,21 +348,24 @@ export default function ProdutosEspecificos() {
                     </div>
                     {usuarioLogadoId === avaliacao.id_usuario && (
                       <button
-                        onClick={() => setAvaliacaoSelecionada(avaliacao)}
-                        className="w-[27px] h-[27px] bg-[#fcfbf7] rounded-full flex items-center justify-center hover:opacity-70 transition"
+                        onClick={(e) => { e.stopPropagation(); abrirModalEdicao(avaliacao); }}
+                        className="w-[27px] h-[27px] bg-[#fcfbf7] rounded-full flex items-center justify-center hover:bg-gray-200 transition"
                       >
                         <Image src="/images/lapis2.png" alt="Editar" width={17} height={17} />
                       </button>
                     )}
                   </div>
                 </div>
-                <p className="text-gray-700 text-lg pointer-events-auto">{avaliacao.comentario}</p>
+                <p className="text-gray-700 text-lg">{avaliacao.comentario}</p>
               </div>
             ))}
+            
+            {avaliacoes.length === 0 && (
+              <div className="text-gray-500 italic mt-4">Nenhuma avaliação ainda. Seja o primeiro!</div>
+            )}
           </div>
         </div>
 
-        {/* Bloco da Mesma Loja */}
         {produtosMesmaLoja.length > 0 && (
           <div className="flex flex-col gap-6">
             <h2 className="text-3xl font-extrabold text-gray-900">Da mesma loja</h2>
@@ -294,56 +378,92 @@ export default function ProdutosEspecificos() {
               className={`flex flex-row gap-6 overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] select-none ${isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x"}`}
             >
               {produtosMesmaLoja.map((p) => (
-            <div 
-                key={p.id} 
-                className="min-w-[220px] snap-start cursor-pointer"
-                onClick={() => {
-                if (!isDragging) {
-                  router.push(`/produto-especifico/${p.id}`);
-                }
-              }}
-            >
-            <CardProduto data={p} />
-            </div>
-            ))} 
+                <div key={p.id} className="min-w-[220px] snap-start cursor-pointer" onClick={() => { if (!isDragging) router.push(`/produto-especifico/${p.id}`); }}>
+                  <CardProduto data={p} />
+                </div>
+              ))} 
             </div>
           </div>
         )}
       </div>
 
-      {/* MODAIS (Ocultos até serem importados) */}
+      {modalAvaliacaoOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#ebebeb] w-full max-w-[650px] rounded-[2.5rem] p-10 flex flex-col items-center gap-6 relative shadow-2xl">
+            <button onClick={() => setModalAvaliacaoOpen(false)} className="absolute top-6 right-6 text-black hover:opacity-60 text-3xl font-light">✕</button>
+            <h2 className="text-2xl font-normal text-black mt-2">Você está editando a avaliação de <span className="font-semibold">{produto?.nome}</span></h2>
+
+            <div className="flex gap-2 my-2">
+              {[1, 2, 3, 4, 5].map((estrela) => (
+                <button key={estrela} onClick={() => setModalNota(estrela)} className="transition-transform hover:scale-110">
+                  {estrela <= modalNota ? (
+                    <svg className="w-14 h-14 text-[#6A38F3]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                  ) : (
+                    <svg className="w-14 h-14 text-[#6A38F3]" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            <div className="w-full bg-white rounded-2xl p-6 min-h-[220px] shadow-inner flex flex-col">
+              <textarea value={modalComentario} onChange={(e) => setModalComentario(e.target.value)} placeholder="Avaliação da loja" className="w-full flex-1 outline-none resize-none text-gray-700 text-base font-light" />
+            </div>
+
+            <div className="w-full flex flex-col gap-4 mt-4 px-12">
+              <button onClick={handleDeletarAvaliacao} className="w-full py-3 bg-[#FF0000] text-white font-semibold rounded-full shadow-md text-sm tracking-wider uppercase hover:opacity-90 transition">DELETAR</button>
+              <button onClick={handleSalvarAvaliacao} className="w-full py-3 bg-[#6A38F3] text-white font-semibold rounded-full shadow-lg text-sm tracking-wider uppercase hover:opacity-90 transition">Salvar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalCriarOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#ebebeb] w-full max-w-[650px] rounded-[2.5rem] p-10 flex flex-col items-center gap-6 relative shadow-2xl">
+            <button onClick={() => setModalCriarOpen(false)} className="absolute top-6 right-6 text-black hover:opacity-60 text-3xl font-light">✕</button>
+            <h2 className="text-2xl font-normal text-black mt-2">Você está avaliando <span className="font-semibold">{produto?.nome}</span></h2>
+
+            <div className="flex gap-2 my-2">
+              {[1, 2, 3, 4, 5].map((estrela) => (
+                <button key={estrela} onClick={() => setCriarNota(estrela)} className="transition-transform hover:scale-110 w-14 h-14">
+                  <svg viewBox="0 0 138 132" fill={estrela <= criarNota ? "#8A38F5" : "none"} xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                    <path d="M64.2949 3.67505C65.6449 -0.558235 71.6355 -0.55837 72.9854 3.67505L85.5371 43.0422C86.2758 45.3589 88.4337 46.9267 90.8652 46.9133L132.185 46.6858C136.628 46.6617 138.478 52.3594 134.869 54.9514L101.308 79.054C99.3329 80.4724 98.5084 83.0094 99.2725 85.3176L112.258 124.544C113.654 128.763 108.807 132.283 105.227 129.652L87.4395 116.578L71.9326 105.181C69.9734 103.741 67.3059 103.741 65.3467 105.181L32.0527 129.652C28.4723 132.283 23.6263 128.763 25.0225 124.544L38.0068 85.3176C38.7709 83.0093 37.9465 80.4724 35.9717 79.054L2.41016 54.9514C-1.19912 52.3594 0.652166 46.6613 5.0957 46.6858L46.4141 46.9133C48.8456 46.9267 51.0045 45.3589 51.7432 43.0422L64.2949 3.67505Z" stroke="#8A38F5" strokeWidth="5"/>
+                  </svg>
+                </button>
+              ))}
+            </div>
+
+            <div className="w-full bg-white rounded-2xl p-6 min-h-[220px] shadow-inner flex flex-col">
+              <textarea value={criarComentario} onChange={(e) => setCriarComentario(e.target.value)} placeholder="Avaliação da loja" className="w-full flex-1 outline-none resize-none text-gray-700 text-base font-light placeholder-gray-400" />
+            </div>
+
+            <div className="w-full flex flex-col gap-4 mt-4 px-12">
+              <button onClick={handleCriarAvaliacao} className="w-full py-3 bg-[#6A38F3] text-white font-semibold rounded-full shadow-lg text-sm tracking-wider uppercase hover:opacity-90 transition-all">Avaliar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
 
-// 3. Componente CardProduto atualizado com imagem dinâmica do banco
 function CardProduto({ data }: { data: Produto }) {
   const isDisponivel = data.estoque > 0;
-  
-  // Pega a primeira imagem do array do banco se existir, caso contrário usa a padrão
-  const imagemCard = data.imagens && data.imagens.length > 0 
-    ? data.imagens[0].url_imagem
-    : IMAGE_FALLBACK;
+  const imagemCard = data.imagens && data.imagens.length > 0 ? data.imagens[0].url_imagem : IMAGE_FALLBACK;
 
   return (
-    <div className="bg-white rounded-[2rem] p-5 shadow-sm flex flex-col gap-3 relative pointer-events-auto cursor-pointer hover:border-gray-200 border border-transparent transition-all">
-      <div className="absolute top-4 right-4 w-[48px] h-[48px] bg-white rounded-full z-10 overflow-hidden shadow-sm border border-gray-100 flex items-center justify-center">
+    <div className="bg-white rounded-[2rem] p-5 shadow-sm flex flex-col gap-3 border border-transparent hover:border-gray-200 transition-all cursor-pointer relative">
+      <div className="absolute top-4 right-4 w-[48px] h-[48px] bg-white rounded-full overflow-hidden shadow-sm flex items-center justify-center z-10">
         <Image src="/images/cjr.png" alt="Logo cjr" width={48} height={48} className="w-full h-full object-cover" />
       </div>
       <div className="w-full h-36 bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center relative">
-        <Image 
-          src={imagemCard} 
-          alt={data.nome} 
-          fill
-          className="w-full h-full object-contain p-2" 
-        />
+        <img src={imagemCard} alt={data.nome} className="w-full h-full object-contain p-2" />
       </div>
       <div className="flex flex-col gap-1 mt-1">
         <h3 className="font-extrabold text-lg text-gray-900 truncate">{data.nome}</h3>
         <p className="font-bold text-xl text-gray-900">R${Number(data.preco).toFixed(2).replace(".", ",")}</p>
-        <p className={`text-xs font-bold mt-1 uppercase ${isDisponivel ? "text-[#C6E700]" : "text-[#AF052A]"}`}>
-          {isDisponivel ? "DISPONÍVEL" : "INDISPONÍVEL"}
-        </p>
+        <p className={`text-xs font-bold mt-1 uppercase ${isDisponivel ? "text-[#C6E700]" : "text-[#AF052A]"}`}>{isDisponivel ? "DISPONÍVEL" : "INDISPONÍVEL"}</p>
       </div>
     </div>
   );
