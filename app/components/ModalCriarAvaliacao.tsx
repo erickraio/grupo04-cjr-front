@@ -26,6 +26,7 @@ interface ModalCriarAvaliacaoProps {
     nomeProduto?: string;
     idProduto: number;
     onAvaliacaoCriada?: () => void;
+    tipo?: 'produto' | 'loja';
 }
 
 export default function ModalCriarAvaliacao({
@@ -34,6 +35,7 @@ export default function ModalCriarAvaliacao({
     nomeProduto = '',
     idProduto,
     onAvaliacaoCriada,
+    tipo = 'produto',
 }: ModalCriarAvaliacaoProps) {
 
     const [rating, setRating] = useState(0);
@@ -152,7 +154,7 @@ export default function ModalCriarAvaliacao({
                 <textarea
                     value={comentario}
                     onChange={(e) => setComentario(e.target.value)}
-                    placeholder="Avaliação da loja"
+                    placeholder={`Avaliação do ${tipo === 'produto' ? 'produto' : 'loja'}`}
                     rows={10}
                     className="w-full bg-white rounded-2xl p-6 text-sm text-gray-700 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#7C3AED] mb-8"
                 />
