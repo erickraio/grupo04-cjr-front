@@ -3,16 +3,27 @@ import React, {useEffect, useState} from 'react';
 import {User, LogOut} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+        function getUserIdFromToken(): number | null {
+            const token = localStorage.getItem("@StockIO:token");
+            if (!token) return null;
+            try {
+                const payload = JSON.parse(atob(token.split(".")[1]));
+                return payload.sub ?? null;
+            } catch {
+                return null;
+            }
+        }
 
     export default function Navbar() {
         const [logado, setLogado] = useState(false);
         const router = useRouter();
-
+        const [userId, setUserId] = useState<number | null>(null);
     useEffect(() => {
         const token = localStorage.getItem("@StockIO:token");
         if (token){
             setLogado(true);
         }
+        setUserId(getUserIdFromToken());
     }, [])
 
     const handleLogout = () => {
@@ -33,7 +44,7 @@ import { useRouter } from 'next/navigation';
                     {logado?(
                         <div className="flex items-center gap-6">
                             <button 
-                                onClick={() => router.push("/perfil")}
+                               onClick={() => router.push(`/perfil/${userId}`)}
                                 className="text-white transition-colors cursor-pointer"
                                 title="Perfil"
                                 >
