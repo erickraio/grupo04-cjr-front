@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 
 const nextConfig: NextConfig = {
-<<<<<<< HEAD
+
   
   images: {
     unoptimized: true,
@@ -15,16 +15,6 @@ const nextConfig: NextConfig = {
 
       },
 
-=======
-   images: {
-    remotePatterns: [
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '3001',
-        pathname: '/uploads/**', 
-      },
->>>>>>> main
     ],
   },
 };

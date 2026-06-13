@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Navbar from "../../components/navbar";
 import Image from "next/image";
-import ModalCriarProduto from "@/app/components/ModalCriarProduto";
+
 import ModalCriarAvaliacao from "@/app/components/ModalCriarAvaliacao";
 import ModalEditarAvaliacao from "../../components/ModalEditarAvaliacao";
 
@@ -153,8 +153,8 @@ export default function ProdutosEspecificos() {
   }
 
   const listaImagens = produto?.imagens && produto.imagens.length > 0
-    ? produto.imagens.map((img) => img.url_imagem)
-    : [IMAGE_FALLBACK];
+  ? produto.imagens.map((img) => `${API_URL}${img.url_imagem}`)
+  : [IMAGE_FALLBACK];
 
   return (
     <div className="bg-[#f6f3e4] min-h-screen pb-12 flex flex-col items-center font-sans">
@@ -313,13 +313,7 @@ export default function ProdutosEspecificos() {
       </div>
 
       {/* Modal de edição do produto (ficha do produto) */}
-      <ModalCriarProduto
-        isOpen={modalEditarProdutoOpen}
-        onClose={() => setModalEditarProdutoOpen(false)}
-        idLoja={produto?.id_loja ?? 0}
-        onProdutoCriado={fetchProduto}
-      />
-
+      
       {/* Modal de criar avaliação nova */}
       <ModalCriarAvaliacao
         isOpen={modalCriarOpen}
@@ -343,7 +337,9 @@ export default function ProdutosEspecificos() {
 
 function CardProduto({ data }: { data: Produto }) {
   const isDisponivel = data.estoque > 0;
-  const imagemCard = data.imagens && data.imagens.length > 0 ? data.imagens[0].url_imagem : IMAGE_FALLBACK;
+ const imagemCard = data.imagens && data.imagens.length > 0
+  ? `${API_URL}${data.imagens[0].url_imagem}`
+  : IMAGE_FALLBACK;
 
   return (
     <div className="bg-white rounded-[2rem] p-5 shadow-sm flex flex-col gap-3 border border-transparent hover:border-gray-200 transition-all cursor-pointer relative">
