@@ -4,7 +4,10 @@ import React, { useEffect, useState, Suspense, useRef } from 'react';
 import { ChevronLeft, Mail, Plus, Star, X } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import Navbar from '../../components/navbar';
+import ModalAdicionarLoja from '../../components/ModalAdicionarLoja';
+import ModalEditarLoja from '../../components/ModalEditarLoja'; 
 import Image from 'next/image';
+
 const cameraImg = "/camera.png";
 
 function CameraIcon() {
@@ -38,18 +41,10 @@ function PerfilContent() {
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
 
+  // ESTADOS DAS MODAIS DE LOJA AQUI
   const [isAddLojaModalOpen, setIsAddLojaModalOpen] = useState(false);
-  const [novaLojaNome, setNovaLojaNome] = useState('');
-  const [novaLojaDescricao, setNovaLojaDescricao] = useState('');
-  const [novaLojaCategoria, setNovaLojaCategoria] = useState(''); 
-  
-  const [fotoPerfilFile, setFotoPerfilFile] = useState<File | null>(null);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
-
-  const fotoPerfilRef = useRef<HTMLInputElement>(null);
-  const logoRef = useRef<HTMLInputElement>(null);
-  const bannerRef = useRef<HTMLInputElement>(null);
+  const [isEditLojaModalOpen, setIsEditLojaModalOpen] = useState(false); // <-- ADICIONADO
+  const [lojaSelecionada, setLojaSelecionada] = useState<any>(null);     // <-- ADICIONADO
 
   const handleSalvarSenha = async () => {
     if (novaSenha !== confirmarSenha) {
@@ -93,7 +88,6 @@ function PerfilContent() {
     async function fetchPerfil() {
       try {
         const token = localStorage.getItem("@StockIO:token");
-        
         const urlId = params?.id as string; 
         
         if (!token && !urlId) {
@@ -213,46 +207,6 @@ function PerfilContent() {
     }
   };
 
-  const handleCriarLoja = async () => {
-    if (!novaLojaNome.trim()) {
-      alert("O nome da loja é obrigatório!");
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("@StockIO:token");
-
-      const response = await fetch('http://localhost:3001/lojas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          nome: novaLojaNome,
-          descricao: novaLojaDescricao,
-          id_dono: userData.id,
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Erro ao criar loja.");
-      }
-
-      alert("Loja criada com sucesso!");
-      setIsAddLojaModalOpen(false);
-      setNovaLojaNome('');
-      setNovaLojaDescricao('');
-
-      window.location.reload();
-
-    } catch (err: any) {
-      console.error("Erro ao criar loja:", err);
-      alert(err.message || "Não foi possível criar a loja.");
-    }
-  };
-
   if (loading) return <div className="min-h-screen bg-[#f6f3e4] flex items-center justify-center font-bold text-black">Carregando perfil...</div>;
   if (!userData) return <div className="min-h-screen bg-[#f6f3e4] flex items-center justify-center font-bold text-black">Usuário não encontrado.</div>;
   
@@ -338,7 +292,15 @@ function PerfilContent() {
             {lojas.length > 0 ? (
               <div className="flex gap-6 overflow-x-auto pb-4">
                 {lojas.map((loja: any) => (
-                  <div key={loja.id} className="min-w-[400px] bg-white rounded-3xl p-6 shadow-sm flex justify-between items-center border border-gray-100">
+                  <div 
+                    key={loja.id} 
+                    // EVENTO DE CLIQUE ADICIONADO AQUI 👇
+                    onClick={() => {
+                      setLojaSelecionada({ id: loja.id, nome: loja.nome, categoria: 'beleza' });
+                      setIsEditLojaModalOpen(true);
+                    }}
+                    className="min-w-[400px] bg-white rounded-3xl p-6 shadow-sm flex justify-between items-center border border-gray-100 cursor-pointer hover:border-purple-200 transition-all shrink-0"
+                  >
                     <div>
                       <h3 className="text-3xl font-light text-black">{loja.nome}</h3>
                       <p className="text-[#7c3aed] text-lg font-medium mt-1">beleza</p> 
@@ -354,7 +316,6 @@ function PerfilContent() {
             )}
           </div>
         )}
-
 {todasAvaliacoes.length > 0 && (
   <div>
     <h2 className="text-3xl font-bold text-black mb-6">Avaliações</h2>
@@ -367,6 +328,7 @@ function PerfilContent() {
         <div key={av.id_loja ? `loja-${av.id}` : `produto-${av.id}`} className="bg-white rounded-3xl p-6 shadow-sm flex gap-6 border border-gray-100">
           <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 bg-gray-200 border-2 border-white shadow-sm">
              <img src={userData.foto_perfil_url || "/default-avatar.png"} alt={userData.nome} className="w-full h-full object-cover" />
+
           </div>
           <div className="w-full">
             <div className="flex justify-between items-start mb-2">
@@ -544,96 +506,18 @@ function PerfilContent() {
         </div>
       )}
 
-      {isAddLojaModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-[500px] bg-[#EAEAEA] rounded-[2rem] p-8 shadow-2xl mx-4 flex flex-col items-center">
-            
-            <div className="absolute top-6 right-6">
-              <button 
-                onClick={() => setIsAddLojaModalOpen(false)} 
-                className="text-black hover:text-gray-500 transition-colors cursor-pointer"
-              >
-                <X size={28} />
-              </button>
-            </div>
+      {/* COMPONENTES RENDERIZADOS AQUI NO FINAL 👇 */}
+      <ModalAdicionarLoja 
+        isOpen={isAddLojaModalOpen} 
+        onClose={() => setIsAddLojaModalOpen(false)} 
+        userId={userData.id} 
+      />
 
-            <h2 className="text-[28px] font-extrabold text-black mb-8 mt-2">Adicionar loja</h2>
-
-            <div className="w-full flex flex-col gap-4 mb-6">
-              <input 
-                type="text" 
-                placeholder="Nome da loja" 
-                value={novaLojaNome} 
-                onChange={(e) => setNovaLojaNome(e.target.value)}
-                className="w-full px-6 py-4 rounded-full bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm font-medium"
-              />
-              
-              <div className="relative w-full">
-                <select 
-                  value={novaLojaCategoria} 
-                  onChange={(e) => setNovaLojaCategoria(e.target.value)}
-                  className="w-full px-6 py-4 rounded-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm appearance-none font-medium cursor-pointer"
-                >
-                  <option value="" disabled>Categoria</option>
-                  <option value="beleza">Beleza</option>
-                  <option value="eletronicos">Eletrônicos</option>
-                  <option value="roupas">Roupas</option>
-                  <option value="outros">Outros</option>
-                </select>
-                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                  <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 1L7 7L13 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="w-full flex flex-col gap-3 mb-8">
-              
-              <input type="file" ref={fotoPerfilRef} className="hidden" accept="image/*" onChange={(e) => setFotoPerfilFile(e.target.files?.[0] || null)} />
-              <div 
-                onClick={() => fotoPerfilRef.current?.click()}
-                className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl py-6 flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/50 transition-colors bg-transparent"
-              >
-                <img src="/envio-foto.png" alt="Upload" className="w-8 h-10 mb-2 object-contain" />
-                <span className="text-gray-700 font-medium text-sm">
-                  {fotoPerfilFile ? fotoPerfilFile.name : "Anexe a foto de perfil de sua loja"}
-                </span>
-              </div>
-
-              <input type="file" ref={logoRef} className="hidden" accept=".svg, image/*" onChange={(e) => setLogoFile(e.target.files?.[0] || null)} />
-              <div 
-                onClick={() => logoRef.current?.click()}
-                className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl py-6 flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/50 transition-colors bg-transparent"
-              >
-                <img src="/envio-foto.png" alt="Upload" className="w-8 h-10 mb-2 object-contain" />
-                <span className="text-gray-700 font-medium text-sm">
-                  {logoFile ? logoFile.name : "Anexe a logo em SVG de sua loja"}
-                </span>
-              </div>
-
-              <input type="file" ref={bannerRef} className="hidden" accept="image/*" onChange={(e) => setBannerFile(e.target.files?.[0] || null)} />
-              <div 
-                onClick={() => bannerRef.current?.click()}
-                className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl py-6 flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/50 transition-colors bg-transparent"
-              >
-                <img src="/envio-foto.png" alt="Upload" className="w-8 h-10 mb-2 object-contain" />
-                <span className="text-gray-700 font-medium text-sm">
-                  {bannerFile ? bannerFile.name : "Anexe o banner de sua loja"}
-                </span>
-              </div>
-
-            </div>
-
-            <button 
-              onClick={handleCriarLoja}
-              className="w-full max-w-[280px] bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-bold py-4 px-6 rounded-full shadow-[0px_4px_14px_rgba(124,58,237,0.4)] transition-all cursor-pointer"
-            >
-              Adicionar
-            </button>
-          </div>
-        </div>
-      )}
+      <ModalEditarLoja 
+        isOpen={isEditLojaModalOpen} 
+        onClose={() => setIsEditLojaModalOpen(false)} 
+        lojaDados={lojaSelecionada} 
+      />
 
     </div>
   );
