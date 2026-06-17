@@ -3,8 +3,8 @@
 import React, { useEffect, useState, Suspense, useRef } from 'react';
 import { ChevronLeft, Mail, Plus, Star, X } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
-import Navbar from '../../components/navbar';
-import ModalAdicionarLoja from '../../components/ModalAdicionarLoja';
+import Navbar from '../components/navbar';
+import ModalAdicionarLoja from '../components/ModalAdicionarLoja';
 import Image from 'next/image';
 
 const cameraImg = "/camera.png";
