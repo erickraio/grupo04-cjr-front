@@ -7,8 +7,6 @@ import CardProduto from '../../components/CardProdutos';
 import Image from 'next/image';
 import { AnyCaaRecord } from 'dns';
 
-
-
 interface ProdutoProps {
   id: number;
   nome: string;
