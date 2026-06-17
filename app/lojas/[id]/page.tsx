@@ -217,6 +217,8 @@ export default function Loja() {
         <ModalAvaliarLoja
           isOpen={modalavaliacaoAberto}
           onClose={() => setModalAvaliacaoAberto(false)}
+          nomeLoja={loja?.nome}
+          idLoja={loja?.id}
         />
       )}
 
