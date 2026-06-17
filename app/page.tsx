@@ -6,7 +6,7 @@ import Image from "next/image";
 
 
 // ==========================================
-// COMPONENTE PRINCIPAL (PÁGINA)import {useState} from "react";
+// COMPONENTE PRINCIPAL (PÁGINA)
 import Searchbar from "./components/searchbar";
 import axios from "axios";
 import Link from "next/link";
