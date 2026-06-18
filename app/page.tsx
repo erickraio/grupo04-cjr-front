@@ -61,7 +61,7 @@ export default function Home() {
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
         // Dispara as três requisições ao mesmo tempo
         const [resCategorias, resProdutos, resLojas] = await Promise.all([
@@ -74,6 +74,10 @@ export default function Home() {
         const dataCategorias = await resCategorias.json();
         const dataProdutos = await resProdutos.json();
         const dataLojas = await resLojas.json();
+
+        console.log("Categorias do Back:", dataCategorias);
+        console.log("Produtos do Back:", dataProdutos);
+        console.log("Lojas do Back:", dataLojas); 
 
         // Atualiza os estados com os dados reais
         setCategorias(dataCategorias);
@@ -165,7 +169,7 @@ export default function Home() {
             </div>
 
             <div className="flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
-              {produtos.map((produto: any) => (
+              {Array.isArray(produtos) && produtos.map((produto: any) => (
                 <div key={produto.id} className="min-w-[220px] md:min-w-[260px]">
                   <CardProdutos data={produto} />
                 </div>
