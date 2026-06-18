@@ -17,17 +17,17 @@ export default function ModalAlterarSenha({ isOpen, onClose }: ModalAlterarSenha
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       
       {/* Container Principal do Modal (Caixa Cinza/Branca) */}
-      <div className="relative w-full max-w-[420px] bg-[#F2F2F2] rounded-[2.5rem] p-8 shadow-2xl mx-4 flex flex-col items-center">
+      <div className="relative w-full max-w-[420px] bg-[#F2F2F2] dark:bg-[#2A2A2A] rounded-[2.5rem] p-8 shadow-2xl mx-4 flex flex-col items-center transition-colors duration-300">
         
         {/* Botões do Topo (Voltar e Fechar) */}
         <div className="absolute top-6 left-6 right-6 flex justify-between items-center">
-          <button onClick={onClose} className="text-black hover:text-gray-500 transition-colors">
+          <button onClick={onClose} className="text-black dark:text-white hover:text-gray-500 dark:hover:text-gray-300 transition-colors cursor-pointer">
             {/* Ícone de Seta (Voltar) */}
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <button onClick={onClose} className="text-black hover:text-gray-500 transition-colors">
+          <button onClick={onClose} className="text-black dark:text-white hover:text-gray-500 dark:hover:text-gray-300 transition-colors cursor-pointer">
             {/* Ícone de X (Fechar) */}
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -51,22 +51,22 @@ export default function ModalAlterarSenha({ isOpen, onClose }: ModalAlterarSenha
           <input 
             type="password" 
             placeholder="Senha Antiga" 
-            className="w-full px-6 py-3.5 rounded-full bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm"
+            className="w-full px-6 py-3.5 rounded-full bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm transition-colors duration-300"
           />
           <input 
             type="password" 
             placeholder="Nova Senha" 
-            className="w-full px-6 py-3.5 rounded-full bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm"
+            className="w-full px-6 py-3.5 rounded-full bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm transition-colors duration-300"
           />
           <input 
             type="password" 
             placeholder="Confirmar Senha" 
-            className="w-full px-6 py-3.5 rounded-full bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm"
+            className="w-full px-6 py-3.5 rounded-full bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm transition-colors duration-300"
           />
         </div>
 
         {/* Botão de Salvar */}
-        <button className="w-full max-w-[280px] bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-medium py-3.5 px-6 rounded-full shadow-[0px_4px_14px_rgba(124,58,237,0.4)] transition-all">
+        <button className="w-full max-w-[280px] bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-medium py-3.5 px-6 rounded-full shadow-[0px_4px_14px_rgba(124,58,237,0.4)] transition-all cursor-pointer">
           Salvar Senha
         </button>
 

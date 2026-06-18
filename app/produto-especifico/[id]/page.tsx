@@ -146,8 +146,8 @@ export default function ProdutosEspecificos() {
 
   if (loading) {
     return (
-      <div className="bg-[#f6f3e4] min-h-screen flex items-center justify-center">
-        <p className="text-gray-500 text-lg">Carregando produto...</p>
+      <div className="bg-[#f6f3e4] dark:bg-[#1A1A1A] min-h-screen flex items-center justify-center transition-colors duration-300">
+        <p className="text-gray-500 dark:text-gray-400 text-lg transition-colors duration-300">Carregando produto...</p>
       </div>
     );
   }
@@ -157,7 +157,7 @@ export default function ProdutosEspecificos() {
   : [IMAGE_FALLBACK];
 
   return (
-    <div className="bg-[#f6f3e4] min-h-screen pb-12 flex flex-col items-center font-sans">
+    <div className="bg-[#f6f3e4] dark:bg-[#1A1A1A] min-h-screen pb-12 flex flex-col items-center font-sans transition-colors duration-300">
       <Navbar />
 
       <div className="w-full max-w-[1200px] px-8 flex flex-col gap-16 mt-24">
@@ -170,16 +170,16 @@ export default function ProdutosEspecificos() {
                 <button
                   key={i}
                   onClick={() => setSelectedThumb(i)}
-                  className={`w-[130px] h-[120px] bg-white rounded-2xl shadow-sm overflow-hidden border-2 transition-all flex-shrink-0 ${selectedThumb === i ? "border-[#6A38F3]" : "border-transparent hover:border-gray-300"}`}
+                  className={`w-[130px] h-[120px] bg-white dark:bg-[#2A2A2A] rounded-2xl shadow-sm overflow-hidden border-2 transition-all flex-shrink-0 ${selectedThumb === i ? "border-[#6A38F3]" : "border-transparent hover:border-gray-300 dark:hover:border-gray-600"}`}
                 >
                   <Image src={src} alt={`imagem ${i + 1}`} width={130} height={120} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
 
-            <div className="flex-1 bg-white rounded-3xl shadow-sm relative overflow-hidden flex items-center justify-center">
+            <div className="flex-1 bg-white dark:bg-[#2A2A2A] rounded-3xl shadow-sm relative overflow-hidden flex items-center justify-center transition-colors duration-300">
               <Image src={listaImagens[selectedThumb] || IMAGE_FALLBACK} alt="Produto principal" fill className="object-contain p-4" />
-              <div className="absolute top-4 right-4 w-[52px] h-[52px] rounded-full overflow-hidden shadow-md border-2 border-white z-10">
+              <div className="absolute top-4 right-4 w-[52px] h-[52px] rounded-full overflow-hidden shadow-md border-2 border-white dark:border-[#2A2A2A] z-10 transition-colors duration-300">
                 <Image src="/images/cjr.png" alt="Logo CJR" width={52} height={52} className="w-full h-full object-cover" />
               </div>
             </div>
@@ -187,7 +187,7 @@ export default function ProdutosEspecificos() {
 
           <div className="flex flex-col w-full md:w-1/2 gap-6 justify-start">
             <div className="flex justify-between items-start">
-              <h1 className="text-4xl font-extrabold text-[#000000]">{produto?.nome ?? "Produto"}</h1>
+              <h1 className="text-4xl font-extrabold text-[#000000] dark:text-white transition-colors duration-300">{produto?.nome ?? "Produto"}</h1>
               <div className="flex gap-2">
                 <button
                   onClick={() => setModalEditarProdutoOpen(true)}
@@ -204,22 +204,22 @@ export default function ProdutosEspecificos() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <span className="flex items-center gap-1 text-[#000000] font-bold">
+            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
+              <span className="flex items-center gap-1 text-[#000000] dark:text-white font-bold transition-colors duration-300">
                 <Image src="/images/estrela.png" alt="estrela1" width={17} height={17} />
-                {notaMedia} <span className="text-gray-500 font-normal">| {avaliacoes.length} reviews</span>
+                {notaMedia} <span className="text-gray-500 dark:text-gray-400 font-normal transition-colors duration-300">| {avaliacoes.length} reviews</span>
               </span>
-              <span className="text-[#6A38F3]">{produto?.categoria?.nome ?? "categoria"}</span>
-              <span className="text-[#6A38F3]">{produto?.estoque ?? 0} disponíveis</span>
+              <span className="text-[#6A38F3] dark:text-[#9b73f8] transition-colors duration-300">{produto?.categoria?.nome ?? "categoria"}</span>
+              <span className="text-[#6A38F3] dark:text-[#9b73f8] transition-colors duration-300">{produto?.estoque ?? 0} disponíveis</span>
             </div>
 
-            <p className="text-5xl font-bold text-gray-900">
+            <p className="text-5xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
               R${produto ? Number(produto.preco).toFixed(2).replace(".", ",") : "0,00"}
             </p>
 
             <div className="flex flex-col gap-2 mt-4">
-              <h3 className="font-bold text-xl text-gray-800 uppercase tracking-wide">Descrição</h3>
-              <div className="text-gray-700 leading-relaxed overflow-y-auto max-h-[220px] pr-1">
+              <h3 className="font-bold text-xl text-gray-800 dark:text-gray-200 uppercase tracking-wide transition-colors duration-300">Descrição</h3>
+              <div className="text-gray-700 dark:text-gray-300 leading-relaxed overflow-y-auto max-h-[220px] pr-1 transition-colors duration-300">
                 <p>{produto?.descricao ?? ""}</p>
               </div>
             </div>
@@ -228,7 +228,7 @@ export default function ProdutosEspecificos() {
 
         {/* Bloco de Avaliações */}
         <div className="flex flex-col mt-20 gap-6">
-          <h2 className="text-3xl font-extrabold text-gray-900">Avaliações</h2>
+          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white transition-colors duration-300">Avaliações</h2>
 
           <div
             ref={avaliacoesRef}
@@ -242,7 +242,7 @@ export default function ProdutosEspecificos() {
               <div
                 key={avaliacao.id}
                 onClick={() => { if (!isDragging) router.push(`/avaliacao/${avaliacao.id}`); }}
-                className="bg-[#fcfbf7] hover:bg-[#f5f4ef] transition-colors rounded-[2.5rem] p-8 min-w-[450px] shadow-sm snap-start flex flex-col gap-4 border border-gray-100 cursor-pointer"
+                className="bg-[#fcfbf7] dark:bg-[#2A2A2A] hover:bg-[#f5f4ef] dark:hover:bg-[#3A3A3A] transition-colors duration-300 rounded-[2.5rem] p-8 min-w-[450px] shadow-sm snap-start flex flex-col gap-4 border border-gray-100 dark:border-transparent cursor-pointer"
               >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
@@ -252,7 +252,7 @@ export default function ProdutosEspecificos() {
                         e.stopPropagation();
                         router.push(`/perfil/${avaliacao.id_usuario}`);
                       }}
-                      className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 cursor-pointer hover:opacity-80 transition"
+                      className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex-shrink-0 cursor-pointer hover:opacity-80 transition"
                     >
                       <img
                         src={avaliacao.usuario?.foto_perfil_url || "/images/rosto.png"}
@@ -260,7 +260,7 @@ export default function ProdutosEspecificos() {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <p className="font-bold text-xl text-gray-900">
+                    <p className="font-bold text-xl text-gray-900 dark:text-white transition-colors duration-300">
                       {avaliacao.usuario?.nome ?? avaliacao.usuario?.username ?? "Usuário"}
                     </p>
                   </div>
@@ -273,19 +273,19 @@ export default function ProdutosEspecificos() {
                     {usuarioLogadoId === avaliacao.id_usuario && (
                       <button
                         onClick={(e) => { e.stopPropagation(); abrirModalEdicao(avaliacao); }}
-                        className="w-[27px] h-[27px] bg-[#fcfbf7] rounded-full flex items-center justify-center hover:bg-gray-200 transition"
+                        className="w-[27px] h-[27px] bg-[#fcfbf7] dark:bg-[#3A3A3A] rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
                       >
                         <Image src="/images/lapis2.png" alt="Editar" width={17} height={17} />
                       </button>
                     )}
                   </div>
                 </div>
-                <p className="text-gray-700 text-lg">{avaliacao.comentario}</p>
+                <p className="text-gray-700 dark:text-gray-300 text-lg transition-colors duration-300">{avaliacao.comentario}</p>
               </div>
             ))}
 
             {avaliacoes.length === 0 && (
-              <div className="text-gray-500 italic mt-4">Nenhuma avaliação ainda. Seja o primeiro!</div>
+              <div className="text-gray-500 dark:text-gray-400 italic mt-4 transition-colors duration-300">Nenhuma avaliação ainda. Seja o primeiro!</div>
             )}
           </div>
         </div>
@@ -293,7 +293,7 @@ export default function ProdutosEspecificos() {
         {/* Bloco da Mesma Loja */}
         {produtosMesmaLoja.length > 0 && (
           <div className="flex flex-col gap-6">
-            <h2 className="text-3xl font-extrabold text-gray-900">Da mesma loja</h2>
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white transition-colors duration-300">Da mesma loja</h2>
             <div
               ref={lojaRef}
               onMouseDown={(e) => startDragging(e, lojaRef)}
@@ -312,9 +312,8 @@ export default function ProdutosEspecificos() {
         )}
       </div>
 
-      {/* Modal de edição do produto (ficha do produto) */}
+      {/* Modal de criação e edição mantêm as suas chamadas normais */}
       
-      {/* Modal de criar avaliação nova */}
       <ModalCriarAvaliacao
         isOpen={modalCriarOpen}
         onClose={() => setModalCriarOpen(false)}
@@ -323,7 +322,6 @@ export default function ProdutosEspecificos() {
         onAvaliacaoCriada={fetchAvaliacoes}
       />
 
-      {/* Modal de editar/deletar avaliação existente */}
       <ModalEditarAvaliacao
         isOpen={modalAvaliacaoOpen}
         onClose={() => setModalAvaliacaoOpen(false)}
@@ -342,17 +340,17 @@ function CardProduto({ data }: { data: Produto }) {
   : IMAGE_FALLBACK;
 
   return (
-    <div className="bg-white rounded-[2rem] p-5 shadow-sm flex flex-col gap-3 border border-transparent hover:border-gray-200 transition-all cursor-pointer relative">
-      <div className="absolute top-4 right-4 w-[48px] h-[48px] bg-white rounded-full overflow-hidden shadow-sm flex items-center justify-center z-10">
+    <div className="bg-white dark:bg-[#2A2A2A] rounded-[2rem] p-5 shadow-sm flex flex-col gap-3 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all cursor-pointer relative">
+      <div className="absolute top-4 right-4 w-[48px] h-[48px] bg-white dark:bg-[#3A3A3A] rounded-full overflow-hidden shadow-sm flex items-center justify-center z-10 transition-colors duration-300">
         <Image src="/images/cjr.png" alt="Logo cjr" width={48} height={48} className="w-full h-full object-cover" />
       </div>
-      <div className="w-full h-36 bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center relative">
+      <div className="w-full h-36 bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden flex items-center justify-center relative transition-colors duration-300">
         <img src={imagemCard} alt={data.nome} className="w-full h-full object-contain p-2" />
       </div>
       <div className="flex flex-col gap-1 mt-1">
-        <h3 className="font-extrabold text-lg text-gray-900 truncate">{data.nome}</h3>
-        <p className="font-bold text-xl text-gray-900">R${Number(data.preco).toFixed(2).replace(".", ",")}</p>
-        <p className={`text-xs font-bold mt-1 uppercase ${isDisponivel ? "text-[#C6E700]" : "text-[#AF052A]"}`}>{isDisponivel ? "DISPONÍVEL" : "INDISPONÍVEL"}</p>
+        <h3 className="font-extrabold text-lg text-gray-900 dark:text-white truncate transition-colors duration-300">{data.nome}</h3>
+        <p className="font-bold text-xl text-gray-900 dark:text-white transition-colors duration-300">R${Number(data.preco).toFixed(2).replace(".", ",")}</p>
+        <p className={`text-xs font-bold mt-1 uppercase transition-colors duration-300 ${isDisponivel ? "text-[#C6E700] dark:text-[#D4F514]" : "text-[#AF052A] dark:text-[#FF4D6D]"}`}>{isDisponivel ? "DISPONÍVEL" : "INDISPONÍVEL"}</p>
       </div>
     </div>
   );

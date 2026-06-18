@@ -168,15 +168,15 @@ export default function ModalCriarProduto({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-     <div className="bg-[#EDEDED] w-[90%] max-w-[500px] rounded-[2rem] p-8 shadow-2xl relative max-h-[1020px] ">
+     <div className="bg-[#EDEDED] dark:bg-[#2A2A2A] w-[90%] max-w-[500px] rounded-[2rem] p-8 shadow-2xl relative max-h-[1020px] transition-colors duration-300">
 
         {/* Botão fechar */}
-        <button onClick={handleFechar} className="absolute top-6 right-6 text-black hover:text-gray-500 transition-colors">
+        <button onClick={handleFechar} className="absolute top-6 right-6 text-black dark:text-white hover:text-gray-500 dark:hover:text-gray-300 transition-colors cursor-pointer">
           <X size={24} />
         </button>
 
         {/* Título */}
-        <h2 className="text-2xl font-bold text-center text-black mb-6 mt-1">
+        <h2 className="text-2xl font-bold text-center text-black dark:text-white mb-6 mt-1 transition-colors duration-300">
           Adicionar Produto
         </h2>
 
@@ -192,14 +192,14 @@ export default function ModalCriarProduto({
           />
           <div
             onClick={() => inputPrincipalRef.current?.click()}
-            className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl h-[120px] flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/40 transition-colors mb-3 overflow-hidden"
+            className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl h-[120px] flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/40 dark:hover:bg-[#7C3AED]/10 transition-colors mb-3 overflow-hidden"
           >
             {prevPrincipal ? (
               <img src={prevPrincipal} alt="Preview principal" className="w-full h-full object-cover" />
             ) : (
               <>
                 <CameraIcon size={32} />
-                <span className="text-sm text-gray-500 mt-2">Anexe as fotos do seu produto</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 mt-2 transition-colors duration-300">Anexe as fotos do seu produto</span>
               </>
             )}
           </div>
@@ -217,7 +217,7 @@ export default function ModalCriarProduto({
                 />
                 <div
                   onClick={() => inputsSecundariosRef[i].current?.click()}
-                  className="border-[2px] border-dashed border-[#7C3AED] rounded-2xl h-[90px] flex items-center justify-center cursor-pointer hover:bg-purple-50/40 transition-colors overflow-hidden"
+                  className="border-[2px] border-dashed border-[#7C3AED] rounded-2xl h-[90px] flex items-center justify-center cursor-pointer hover:bg-purple-50/40 dark:hover:bg-[#7C3AED]/10 transition-colors overflow-hidden"
                 >
                   {prevsSecundarias[i] ? (
                     <img src={prevsSecundarias[i]!} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
@@ -237,7 +237,7 @@ export default function ModalCriarProduto({
               placeholder="Nome do produto"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
-              className="w-full px-5 py-3 rounded-full bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm"
+              className="w-full px-5 py-3 rounded-full bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm transition-colors duration-300"
             />
 
             {/* Combobox de subcategorias puxado do banco */}
@@ -245,7 +245,7 @@ export default function ModalCriarProduto({
               <select
                 value={subcategoria}
                 onChange={(e) => setSubcategoria(e.target.value)}
-                className="w-full px-5 py-3 rounded-full bg-white text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm appearance-none cursor-pointer"
+                className="w-full px-5 py-3 rounded-full bg-white dark:bg-[#1A1A1A] text-gray-500 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm appearance-none cursor-pointer transition-colors duration-300"
               >
                 <option value="" disabled>Subcategoria</option>
                 {categorias.map((cat) => (
@@ -254,7 +254,7 @@ export default function ModalCriarProduto({
                   </option>
                 ))}
               </select>
-              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-500 transition-colors duration-300">
                 <svg width="12" height="7" viewBox="0 0 12 7" fill="none">
                   <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -266,7 +266,7 @@ export default function ModalCriarProduto({
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
               rows={3}
-              className="w-full px-5 py-3 rounded-2xl bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm resize-none"
+              className="w-full px-5 py-3 rounded-2xl bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm resize-none transition-colors duration-300"
             />
 
             <input
@@ -274,7 +274,7 @@ export default function ModalCriarProduto({
               placeholder="Preço do produto"
               value={preco}
               onChange={(e) => setPreco(e.target.value)}
-              className="w-full px-5 py-3 rounded-full bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm"
+              className="w-full px-5 py-3 rounded-full bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm transition-colors duration-300"
             />
           </div>
         </div>
@@ -288,7 +288,7 @@ export default function ModalCriarProduto({
              <Image src="/Menos-token.png" alt="Diminuir quantidade" fill className="object-contain" />
           </button>
 
-          <span className="text-2xl font-bold text-black w-8 text-center">{estoque}</span>
+          <span className="text-2xl font-bold text-black dark:text-white w-8 text-center transition-colors duration-300">{estoque}</span>
           <button
             onClick={() => setEstoque((prev) => prev + 1)}
              className="w-10 h-10 relative hover:scale-110 transition-transform cursor-pointer"

@@ -50,7 +50,7 @@ export default function CategoriaEspecifica() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#F6F5ED]">
+    <main className="min-h-screen bg-[#F6F5ED] dark:bg-[#1A1A1A] transition-colors duration-300">
       <Navbar />
 
       {/* ============================================== */}
@@ -88,9 +88,9 @@ export default function CategoriaEspecifica() {
               <input 
                 type="text" 
                 placeholder="Procurar por..." 
-                className="w-full bg-white rounded-full py-4 pl-8 pr-14 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-gray-700 placeholder:text-[#A78BFA] focus:outline-none focus:ring-2 focus:ring-[#7C3AED]"
+                className="w-full bg-white dark:bg-[#2A2A2A] rounded-full py-4 pl-8 pr-14 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-gray-700 dark:text-white placeholder:text-[#A78BFA] focus:outline-none focus:ring-2 focus:ring-[#7C3AED] transition-colors duration-300"
               />
-              <button className="absolute right-6 top-1/2 -translate-y-1/2 text-[#A78BFA] hover:text-[#7C3AED] transition-colors cursor-pointer">
+              <button className="absolute right-6 top-1/2 -translate-y-1/2 text-[#A78BFA] hover:text-[#7C3AED] dark:hover:text-[#9b73f8] transition-colors cursor-pointer">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -103,14 +103,14 @@ export default function CategoriaEspecifica() {
               {subcategorias.map((sub, index) => (
                 <button 
                   key={index}
-                  className="bg-white text-[#A78BFA] font-medium px-6 py-2.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:bg-[#7C3AED] hover:text-white transition-colors cursor-pointer"
+                  className="bg-white dark:bg-[#2A2A2A] text-[#A78BFA] dark:text-[#A78BFA] font-medium px-6 py-2.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:bg-[#7C3AED] hover:text-white dark:hover:bg-[#7C3AED] dark:hover:text-white transition-colors duration-300 cursor-pointer"
                 >
                   {sub}
                 </button>
               ))}
             </div>
             <div className="relative">
-              <select className="appearance-none bg-white text-[#A78BFA] font-medium text-xl w-[240px] md:w-[320px] pl-8 pr-14 py-3 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#7C3AED]">
+              <select className="appearance-none bg-white dark:bg-[#2A2A2A] text-[#A78BFA] dark:text-[#A78BFA] font-medium text-xl w-[240px] md:w-[320px] pl-8 pr-14 py-3 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#7C3AED] transition-colors duration-300">
                 <option value="">ordenar por</option>
                 <option value="menor-preco">Menor Preço</option>
                 <option value="maior-preco">Maior Preço</option>
@@ -132,21 +132,21 @@ export default function CategoriaEspecifica() {
         <div className="max-w-[1200px] w-full mt-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {produtosMock.map((produto) => (
-              <div key={produto.id} className="bg-white w-full rounded-[2rem] p-5 flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md transition-shadow cursor-pointer">
+              <div key={produto.id} className="bg-white dark:bg-[#2A2A2A] w-full rounded-[2rem] p-5 flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md border border-transparent dark:hover:border-gray-700 transition-all cursor-pointer">
                 <div className="relative w-full h-[180px] flex items-center justify-center mb-4">
-                  <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full border border-gray-100 shadow-sm flex items-center justify-center z-10 overflow-hidden">
-                     <span className="text-[9px] font-bold text-gray-400">Loja</span>
+                  <div className="absolute top-0 right-0 w-10 h-10 bg-white dark:bg-[#3A3A3A] rounded-full border border-gray-100 dark:border-transparent shadow-sm flex items-center justify-center z-10 overflow-hidden transition-colors duration-300">
+                     <span className="text-[9px] font-bold text-gray-400 dark:text-gray-300 transition-colors duration-300">Loja</span>
                   </div>
                   <div className="w-full h-full relative flex items-center justify-center">
-                     <div className="w-[80%] h-[80%] bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 text-sm border border-dashed border-gray-200">
+                     <div className="w-[80%] h-[80%] bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm border border-dashed border-gray-200 dark:border-gray-600 transition-colors duration-300">
                         Foto {produto.id}
                      </div>
                   </div>
                 </div>
                 <div className="flex flex-col mt-auto">
-                  <h3 className="text-[18px] font-bold text-black leading-tight mb-1">{produto.nome}</h3>
-                  <span className="text-[16px] font-bold text-black">{produto.preco}</span>
-                  <span className={`text-[11px] font-extrabold mt-1 tracking-wide ${produto.disponivel ? 'text-[#BDEB00]' : 'text-[#DC2626]'}`}>
+                  <h3 className="text-[18px] font-bold text-black dark:text-white leading-tight mb-1 transition-colors duration-300">{produto.nome}</h3>
+                  <span className="text-[16px] font-bold text-black dark:text-white transition-colors duration-300">{produto.preco}</span>
+                  <span className={`text-[11px] font-extrabold mt-1 tracking-wide transition-colors duration-300 ${produto.disponivel ? 'text-[#BDEB00] dark:text-[#D4F514]' : 'text-[#DC2626] dark:text-[#FF4D6D]'}`}>
                     {produto.status}
                   </span>
                 </div>
@@ -154,14 +154,14 @@ export default function CategoriaEspecifica() {
             ))}
           </div>
 
-          <div className="w-full flex justify-center items-center gap-6 mt-16 text-2xl font-light text-gray-500">
-            <button className="hover:text-black transition-colors">&lt;</button>
-            <span className="font-bold text-black cursor-pointer">1</span>
-            <span className="hover:text-black transition-colors cursor-pointer">2</span>
-            <span className="hover:text-black transition-colors cursor-pointer">3</span>
-            <span className="hover:text-black transition-colors cursor-pointer">4</span>
-            <span className="hover:text-black transition-colors cursor-pointer">5</span>
-            <button className="hover:text-black transition-colors">&gt;</button>
+          <div className="w-full flex justify-center items-center gap-6 mt-16 text-2xl font-light text-gray-500 dark:text-gray-400 transition-colors duration-300">
+            <button className="hover:text-black dark:hover:text-white transition-colors">&lt;</button>
+            <span className="font-bold text-black dark:text-white cursor-pointer transition-colors duration-300">1</span>
+            <span className="hover:text-black dark:hover:text-white transition-colors cursor-pointer">2</span>
+            <span className="hover:text-black dark:hover:text-white transition-colors cursor-pointer">3</span>
+            <span className="hover:text-black dark:hover:text-white transition-colors cursor-pointer">4</span>
+            <span className="hover:text-black dark:hover:text-white transition-colors cursor-pointer">5</span>
+            <button className="hover:text-black dark:hover:text-white transition-colors">&gt;</button>
           </div>
         </div>
       </section>
@@ -169,18 +169,18 @@ export default function CategoriaEspecifica() {
       {/* ============================================== */}
       {/* 4. PRINCIPAIS LOJAS (Fundo Preto)              */}
       {/* ============================================== */}
-      <section className="bg-black w-full py-16 px-6 md:px-12 flex justify-center overflow-hidden">
+      <section className="bg-black dark:bg-[#111111] w-full py-16 px-6 md:px-12 flex justify-center overflow-hidden transition-colors duration-300">
         <div className="max-w-[1200px] w-full">
           <h2 className="text-white text-3xl font-bold mb-12">Principais Lojas</h2>
           <div className="flex gap-8 md:gap-12 overflow-x-auto scrollbar-hide pb-4 items-start">
             {lojasMock.map((loja) => (
               <div key={loja.id} className="flex flex-col items-center gap-4 min-w-[120px] cursor-pointer group">
-                <div className="w-[120px] h-[120px] bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-[#7C3AED] transition-all">
-                  <span className="text-black font-bold text-sm">Logo {loja.nome}</span>
+                <div className="w-[120px] h-[120px] bg-white dark:bg-[#2A2A2A] rounded-full flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-[#7C3AED] transition-all duration-300">
+                  <span className="text-black dark:text-white font-bold text-sm transition-colors duration-300">Logo {loja.nome}</span>
                 </div>
                 <div className="text-center">
                   <p className="text-white font-medium text-lg">{loja.nome}</p>
-                  <p className="text-[#7C3AED] text-sm">{loja.categoria}</p>
+                  <p className="text-[#7C3AED] dark:text-[#9b73f8] text-sm transition-colors duration-300">{loja.categoria}</p>
                 </div>
               </div>
             ))}
@@ -191,29 +191,29 @@ export default function CategoriaEspecifica() {
       {/* ============================================== */}
       {/* 5. MAIS POPULARES E RECÉM ADICIONADOS          */}
       {/* ============================================== */}
-      <section className="bg-[#F6F5ED] w-full pt-16 pb-12 px-6 md:px-12 flex justify-center">
+      <section className="bg-[#F6F5ED] dark:bg-[#1A1A1A] w-full pt-16 pb-12 px-6 md:px-12 flex justify-center transition-colors duration-300">
         <div className="max-w-[1200px] w-full flex flex-col gap-16">
           
           {/* Mais populares */}
           <div>
-            <h2 className="text-black text-3xl font-bold mb-8">Mais populares</h2>
+            <h2 className="text-black dark:text-white text-3xl font-bold mb-8 transition-colors duration-300">Mais populares</h2>
             <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4">
               {popularesMock.map((produto) => (
-                <div key={produto.id} className="bg-white min-w-[220px] flex-1 rounded-[2rem] p-5 flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md transition-shadow cursor-pointer">
+                <div key={produto.id} className="bg-white dark:bg-[#2A2A2A] min-w-[220px] flex-1 rounded-[2rem] p-5 flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md border border-transparent dark:hover:border-gray-700 transition-all cursor-pointer">
                   <div className="relative w-full h-[180px] flex items-center justify-center mb-4">
-                    <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full border border-gray-100 shadow-sm flex items-center justify-center z-10 overflow-hidden">
-                       <span className="text-[9px] font-bold text-gray-400">Loja</span>
+                    <div className="absolute top-0 right-0 w-10 h-10 bg-white dark:bg-[#3A3A3A] rounded-full border border-gray-100 dark:border-transparent shadow-sm flex items-center justify-center z-10 overflow-hidden transition-colors duration-300">
+                       <span className="text-[9px] font-bold text-gray-400 dark:text-gray-300 transition-colors duration-300">Loja</span>
                     </div>
                     <div className="w-full h-full relative flex items-center justify-center">
-                       <div className="w-[80%] h-[80%] bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 text-sm border border-dashed border-gray-200">
+                       <div className="w-[80%] h-[80%] bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm border border-dashed border-gray-200 dark:border-gray-600 transition-colors duration-300">
                           Foto {produto.id}
                        </div>
                     </div>
                   </div>
                   <div className="flex flex-col mt-auto">
-                    <h3 className="text-[18px] font-bold text-black leading-tight mb-1">{produto.nome}</h3>
-                    <span className="text-[16px] font-bold text-black">{produto.preco}</span>
-                    <span className={`text-[11px] font-extrabold mt-1 tracking-wide ${produto.disponivel ? 'text-[#BDEB00]' : 'text-[#DC2626]'}`}>
+                    <h3 className="text-[18px] font-bold text-black dark:text-white leading-tight mb-1 transition-colors duration-300">{produto.nome}</h3>
+                    <span className="text-[16px] font-bold text-black dark:text-white transition-colors duration-300">{produto.preco}</span>
+                    <span className={`text-[11px] font-extrabold mt-1 tracking-wide transition-colors duration-300 ${produto.disponivel ? 'text-[#BDEB00] dark:text-[#D4F514]' : 'text-[#DC2626] dark:text-[#FF4D6D]'}`}>
                       {produto.status}
                     </span>
                   </div>
@@ -224,24 +224,24 @@ export default function CategoriaEspecifica() {
 
           {/* Recém adicionados */}
           <div>
-            <h2 className="text-black text-3xl font-bold mb-8">Recém adicionados</h2>
+            <h2 className="text-black dark:text-white text-3xl font-bold mb-8 transition-colors duration-300">Recém adicionados</h2>
             <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4">
               {recentesMock.map((produto) => (
-                <div key={produto.id} className="bg-white min-w-[220px] flex-1 rounded-[2rem] p-5 flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md transition-shadow cursor-pointer">
+                <div key={produto.id} className="bg-white dark:bg-[#2A2A2A] min-w-[220px] flex-1 rounded-[2rem] p-5 flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md border border-transparent dark:hover:border-gray-700 transition-all cursor-pointer">
                   <div className="relative w-full h-[180px] flex items-center justify-center mb-4">
-                    <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full border border-gray-100 shadow-sm flex items-center justify-center z-10 overflow-hidden">
-                       <span className="text-[9px] font-bold text-gray-400">Loja</span>
+                    <div className="absolute top-0 right-0 w-10 h-10 bg-white dark:bg-[#3A3A3A] rounded-full border border-gray-100 dark:border-transparent shadow-sm flex items-center justify-center z-10 overflow-hidden transition-colors duration-300">
+                       <span className="text-[9px] font-bold text-gray-400 dark:text-gray-300 transition-colors duration-300">Loja</span>
                     </div>
                     <div className="w-full h-full relative flex items-center justify-center">
-                       <div className="w-[80%] h-[80%] bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 text-sm border border-dashed border-gray-200">
+                       <div className="w-[80%] h-[80%] bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm border border-dashed border-gray-200 dark:border-gray-600 transition-colors duration-300">
                           Foto {produto.id}
                        </div>
                     </div>
                   </div>
                   <div className="flex flex-col mt-auto">
-                    <h3 className="text-[18px] font-bold text-black leading-tight mb-1">{produto.nome}</h3>
-                    <span className="text-[16px] font-bold text-black">{produto.preco}</span>
-                    <span className={`text-[11px] font-extrabold mt-1 tracking-wide ${produto.disponivel ? 'text-[#BDEB00]' : 'text-[#DC2626]'}`}>
+                    <h3 className="text-[18px] font-bold text-black dark:text-white leading-tight mb-1 transition-colors duration-300">{produto.nome}</h3>
+                    <span className="text-[16px] font-bold text-black dark:text-white transition-colors duration-300">{produto.preco}</span>
+                    <span className={`text-[11px] font-extrabold mt-1 tracking-wide transition-colors duration-300 ${produto.disponivel ? 'text-[#BDEB00] dark:text-[#D4F514]' : 'text-[#DC2626] dark:text-[#FF4D6D]'}`}>
                       {produto.status}
                     </span>
                   </div>

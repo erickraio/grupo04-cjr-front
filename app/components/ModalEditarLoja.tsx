@@ -44,18 +44,18 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados }: ModalEdi
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
       
       {/* Container Principal */}
-      <div className="bg-[#EBEBEB] w-[90%] max-w-[480px] p-8 rounded-[2.5rem] shadow-2xl relative max-h-[95vh] overflow-y-auto scrollbar-hide">
+      <div className="bg-[#EBEBEB] dark:bg-[#2A2A2A] w-[90%] max-w-[480px] p-8 rounded-[2.5rem] shadow-2xl relative max-h-[95vh] overflow-y-auto scrollbar-hide transition-colors duration-300">
         
         {/* Botão Fechar (X) */}
         <button 
           onClick={onClose} 
-          className="absolute top-6 right-8 text-black hover:text-gray-600 transition-colors cursor-pointer"
+          className="absolute top-6 right-8 text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer"
         >
           <X size={32} strokeWidth={1.5} />
         </button>
 
         {/* Título */}
-        <h2 className="text-3xl font-bold text-center text-black mb-8 mt-2">Editar loja</h2>
+        <h2 className="text-3xl font-bold text-center text-black dark:text-white mb-8 mt-2 transition-colors duration-300">Editar loja</h2>
 
         {/* ========================================== */}
         {/* INPUTS DE TEXTO E SELEÇÃO                  */}
@@ -66,14 +66,14 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados }: ModalEdi
             placeholder="Nome da loja" 
             value={nomeLoja}
             onChange={(e) => setNomeLoja(e.target.value)}
-            className="w-full bg-white rounded-full px-6 py-3.5 text-base text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7C3AED]" 
+            className="w-full bg-white dark:bg-[#1A1A1A] rounded-full px-6 py-3.5 text-base text-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7C3AED] transition-colors duration-300" 
           />
 
           <div className="relative">
             <select 
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
-              className="appearance-none w-full bg-white rounded-full px-6 py-3.5 text-base text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7C3AED] cursor-pointer"
+              className="appearance-none w-full bg-white dark:bg-[#1A1A1A] rounded-full px-6 py-3.5 text-base text-gray-700 dark:text-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7C3AED] cursor-pointer transition-colors duration-300"
             >
               <option value="" disabled>Categoria</option>
               <option value="beleza">Beleza</option>
@@ -81,7 +81,7 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados }: ModalEdi
               <option value="moda">Moda</option>
               <option value="eletronicos">Eletrônicos</option>
             </select>
-            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-500 transition-colors duration-300">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
@@ -96,28 +96,28 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados }: ModalEdi
           
           <div 
             onClick={() => fotoPerfilRef.current?.click()}
-            className="w-full h-[95px] border-[1.5px] border-dashed border-[#7C3AED] rounded-2xl flex flex-col items-center justify-center bg-transparent cursor-pointer hover:bg-purple-50 transition-colors"
+            className="w-full h-[95px] border-[1.5px] border-dashed border-[#7C3AED] rounded-2xl flex flex-col items-center justify-center bg-transparent cursor-pointer hover:bg-purple-50 dark:hover:bg-[#7C3AED]/10 transition-colors"
           >
             <UploadIcon />
-            <span className="text-xs text-gray-600 mt-2">Anexe a foto de perfil de sua loja</span>
+            <span className="text-xs text-gray-600 dark:text-gray-300 mt-2 transition-colors duration-300">Anexe a foto de perfil de sua loja</span>
             <input type="file" ref={fotoPerfilRef} className="hidden" accept="image/*" />
           </div>
 
           <div 
             onClick={() => logoRef.current?.click()}
-            className="w-full h-[95px] border-[1.5px] border-dashed border-[#7C3AED] rounded-2xl flex flex-col items-center justify-center bg-transparent cursor-pointer hover:bg-purple-50 transition-colors"
+            className="w-full h-[95px] border-[1.5px] border-dashed border-[#7C3AED] rounded-2xl flex flex-col items-center justify-center bg-transparent cursor-pointer hover:bg-purple-50 dark:hover:bg-[#7C3AED]/10 transition-colors"
           >
             <UploadIcon />
-            <span className="text-xs text-gray-600 mt-2">Anexe a logo em SVG de sua loja</span>
+            <span className="text-xs text-gray-600 dark:text-gray-300 mt-2 transition-colors duration-300">Anexe a logo em SVG de sua loja</span>
             <input type="file" ref={logoRef} className="hidden" accept=".svg, image/*" />
           </div>
 
           <div 
             onClick={() => bannerRef.current?.click()}
-            className="w-full h-[95px] border-[1.5px] border-dashed border-[#7C3AED] rounded-2xl flex flex-col items-center justify-center bg-transparent cursor-pointer hover:bg-purple-50 transition-colors"
+            className="w-full h-[95px] border-[1.5px] border-dashed border-[#7C3AED] rounded-2xl flex flex-col items-center justify-center bg-transparent cursor-pointer hover:bg-purple-50 dark:hover:bg-[#7C3AED]/10 transition-colors"
           >
             <UploadIcon />
-            <span className="text-xs text-gray-600 mt-2">Anexe o banner de sua loja</span>
+            <span className="text-xs text-gray-600 dark:text-gray-300 mt-2 transition-colors duration-300">Anexe o banner de sua loja</span>
             <input type="file" ref={bannerRef} className="hidden" accept="image/*" />
           </div>
 

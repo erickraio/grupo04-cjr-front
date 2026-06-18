@@ -90,7 +90,7 @@ export default function Home() {
 
 
   return (
-    <main className="min-h-screen bg-[#f6f3e4]">
+    <main className="min-h-screen bg-[#f6f3e4] dark:bg-[#1A1A1A] transition-colors duration-300">
 
         {/* NAVBAR */}
       <Navbar />
@@ -129,14 +129,14 @@ export default function Home() {
 
           {/* Categorias */}
           <div>
-            <h2 className="text-2xl font-bold text-black mb-6">Categoria</h2>
+            <h2 className="text-2xl font-bold text-black dark:text-white mb-6 transition-colors">Categoria</h2>
             
             <div className="flex gap-4 md:gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
                {categorias.map((categoria: any) => (
                  <div key={categoria.id} className="flex flex-col items-center gap-3 min-w-[110px] cursor-pointer group">
                     
                     {/* Quadrado Branco do Ícone */}
-                    <div className="w-[100px] h-[100px] bg-white rounded-[2rem] flex items-center justify-center shadow-[0px_4px_15px_rgba(0,0,0,0.03)] border border-transparent group-hover:border-indigo-100 transition-colors">
+                    <div className="w-[100px] h-[100px] bg-white dark:bg-[#2A2A2A] rounded-[2rem] flex items-center justify-center shadow-[0px_4px_15px_rgba(0,0,0,0.03)] border border-transparent transition-colors">
                       <Image 
                         src={getCategoriaIcone(categoria.nome)} 
                         alt={`Ícone ${categoria.nome}`} 
@@ -147,7 +147,7 @@ export default function Home() {
                     </div>
                     
                     {/* Nome da Categoria */}
-                    <span className="text-[15px] font-semibold text-black">{categoria.nome}</span>
+                    <span className="text-[15px] font-semibold text-black dark:text-white transition-colors">{categoria.nome}</span>
                  </div>
                ))}
             </div>
@@ -160,7 +160,7 @@ export default function Home() {
           {/* Produtos: Todos */}
           <div className="mt-4">
             <div className="flex items-baseline gap-3 mb-6">
-              <h2 className="text-3xl font-bold text-black">Produtos</h2>
+              <h2 className="text-3xl font-bold text-black dark:text-white transition-colors">Produtos</h2>
               <span className="text-sm font-medium text-[#7C3AED]">todos</span>
             </div>
             
@@ -177,7 +177,7 @@ export default function Home() {
           {/* Secção Lojas */}
           <div className="mt-12 mb-20">
             <div className="flex justify-between items-end mb-8">
-              <h2 className="text-3xl font-bold text-black">Lojas</h2>
+              <h2 className="text-3xl font-bold text-black dark:text-white transition-colors">Lojas</h2>
               
               {/* Botão de Filtro */}
               <button className="flex items-center gap-12 bg-white rounded-full px-6 py-2 shadow-sm text-[#A78BFA] font-medium text-lg border border-transparent hover:border-indigo-100 transition-all">
@@ -193,12 +193,14 @@ export default function Home() {
               {lojas.map((loja: any) => (
                 <div key={loja.id} className="flex flex-col items-center gap-3 min-w-[130px] cursor-pointer">
                   {/* Círculo da Loja */}
-                  <div className={`w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] bg-black text-white font-bold text-center p-2`}>
+                  <div className={`w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] dark:border-[#1A1A1A] bg-black text-white font-bold text-center p-2 transition-colors`}>
                      <span>{loja.nome}</span>
                   </div>
                   
                   <div className="flex flex-col items-center leading-tight">
-                    <span className="text-lg font-medium text-black">{loja.nome}</span>
+                    <span className="text-lg font-medium text-black dark:text-white transition-colors duration-300">
+                      {loja.nome}
+                    </span>
                   </div>
                 </div>
               ))}

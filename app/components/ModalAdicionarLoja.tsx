@@ -71,18 +71,18 @@ export default function ModalAdicionarLoja({ isOpen, onClose, userId }: ModalAdi
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-[500px] bg-[#EAEAEA] rounded-[2rem] p-8 shadow-2xl mx-4 flex flex-col items-center">
+      <div className="relative w-full max-w-[500px] bg-[#EAEAEA] dark:bg-[#2A2A2A] rounded-[2rem] p-8 shadow-2xl mx-4 flex flex-col items-center transition-colors duration-300">
         
         <div className="absolute top-6 right-6">
           <button 
             onClick={onClose} 
-            className="text-black hover:text-gray-500 transition-colors cursor-pointer"
+            className="text-black dark:text-white hover:text-gray-500 dark:hover:text-gray-300 transition-colors cursor-pointer"
           >
             <X size={28} />
           </button>
         </div>
 
-        <h2 className="text-[28px] font-extrabold text-black mb-8 mt-2">Adicionar loja</h2>
+        <h2 className="text-[28px] font-extrabold text-black dark:text-white mb-8 mt-2 transition-colors duration-300">Adicionar loja</h2>
 
         <div className="w-full flex flex-col gap-4 mb-6">
           <input 
@@ -90,14 +90,14 @@ export default function ModalAdicionarLoja({ isOpen, onClose, userId }: ModalAdi
             placeholder="Nome da loja" 
             value={novaLojaNome} 
             onChange={(e) => setNovaLojaNome(e.target.value)}
-            className="w-full px-6 py-4 rounded-full bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm font-medium"
+            className="w-full px-6 py-4 rounded-full bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm font-medium transition-colors duration-300"
           />
           
           <div className="relative w-full">
             <select 
               value={novaLojaCategoria} 
               onChange={(e) => setNovaLojaCategoria(e.target.value)}
-              className="w-full px-6 py-4 rounded-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm appearance-none font-medium cursor-pointer"
+              className="w-full px-6 py-4 rounded-full bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm appearance-none font-medium cursor-pointer transition-colors duration-300"
             >
               <option value="" disabled>Categoria</option>
               <option value="beleza">Beleza</option>
@@ -105,7 +105,7 @@ export default function ModalAdicionarLoja({ isOpen, onClose, userId }: ModalAdi
               <option value="roupas">Roupas</option>
               <option value="outros">Outros</option>
             </select>
-            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 dark:text-gray-400 transition-colors duration-300">
               <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M1 1L7 7L13 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
@@ -118,10 +118,10 @@ export default function ModalAdicionarLoja({ isOpen, onClose, userId }: ModalAdi
           <input type="file" ref={fotoPerfilRef} className="hidden" accept="image/*" onChange={(e) => setFotoPerfilFile(e.target.files?.[0] || null)} />
           <div 
             onClick={() => fotoPerfilRef.current?.click()}
-            className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl py-6 flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/50 transition-colors bg-transparent"
+            className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl py-6 flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/50 dark:hover:bg-[#7C3AED]/10 transition-colors bg-transparent"
           >
             <img src="/envio-foto.png" alt="Upload" className="w-8 h-10 mb-2 object-contain" />
-            <span className="text-gray-700 font-medium text-sm">
+            <span className="text-gray-700 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
               {fotoPerfilFile ? fotoPerfilFile.name : "Anexe a foto de perfil de sua loja"}
             </span>
           </div>
@@ -129,10 +129,10 @@ export default function ModalAdicionarLoja({ isOpen, onClose, userId }: ModalAdi
           <input type="file" ref={logoRef} className="hidden" accept=".svg, image/*" onChange={(e) => setLogoFile(e.target.files?.[0] || null)} />
           <div 
             onClick={() => logoRef.current?.click()}
-            className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl py-6 flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/50 transition-colors bg-transparent"
+            className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl py-6 flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/50 dark:hover:bg-[#7C3AED]/10 transition-colors bg-transparent"
           >
             <img src="/envio-foto.png" alt="Upload" className="w-8 h-10 mb-2 object-contain" />
-            <span className="text-gray-700 font-medium text-sm">
+            <span className="text-gray-700 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
               {logoFile ? logoFile.name : "Anexe a logo em SVG de sua loja"}
             </span>
           </div>
@@ -140,10 +140,10 @@ export default function ModalAdicionarLoja({ isOpen, onClose, userId }: ModalAdi
           <input type="file" ref={bannerRef} className="hidden" accept="image/*" onChange={(e) => setBannerFile(e.target.files?.[0] || null)} />
           <div 
             onClick={() => bannerRef.current?.click()}
-            className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl py-6 flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/50 transition-colors bg-transparent"
+            className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl py-6 flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/50 dark:hover:bg-[#7C3AED]/10 transition-colors bg-transparent"
           >
             <img src="/envio-foto.png" alt="Upload" className="w-8 h-10 mb-2 object-contain" />
-            <span className="text-gray-700 font-medium text-sm">
+            <span className="text-gray-700 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
               {bannerFile ? bannerFile.name : "Anexe o banner de sua loja"}
             </span>
           </div>
