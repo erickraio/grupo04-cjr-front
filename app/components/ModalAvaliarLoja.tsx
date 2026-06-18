@@ -6,15 +6,56 @@ interface ModalAvaliarLojaProps {
   isOpen: boolean;
   onClose: () => void;
   nomeLoja?: string; // Permite que a tela da loja envie o nome dela dinamicamente
+  onAvaliacaoCriada?: (nota: number, comentario: string) => void;
+  idLoja: string | number; // Callback para enviar a avaliação criada
 }
 
-export default function ModalAvaliarLoja({ isOpen, onClose, nomeLoja = "Rare Beauty" }: ModalAvaliarLojaProps) {
+export default function ModalAvaliarLoja({ isOpen, onClose, nomeLoja = "Rare Beauty", idLoja }: ModalAvaliarLojaProps) {
   // Estado que guarda a nota final clicada
   const [rating, setRating] = useState(0);
   // Estado que guarda a nota temporária enquanto o mouse passa por cima
   const [hoverRating, setHoverRating] = useState(0);
+  const [comentario, setComentario] = useState("");
+  const [enviando, setEnviando] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleSubmit = async () => {
+    if (rating === 0) {
+      alert("Por favor, selecione uma nota antes de enviar sua avaliação.");
+      return;
+    }
+    if (!comentario.trim()) {
+      alert("Por favor, escreva um comentário antes de enviar sua avaliação.");
+      return;
+    }
+    try {
+      setEnviando(true);
+      const token = localStorage.getItem('@StockIO:token');
+      const response = await fetch('http://localhost:3001/aval-loja/' + idLoja, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+      }, 
+        body: JSON.stringify({
+          nota: rating,
+          comentario: comentario
+        }),
+      });
+      if (!response.ok) throw new Error("Erro ao enviar avaliação");
+      alert("Avaliação enviada com sucesso!");
+      setRating(0);
+      setComentario("");
+      onClose();
+  }   catch (error) {
+    console.error("Erro ao enviar avaliação:", error);
+    alert("Ocorreu um erro ao enviar sua avaliação. Por favor, tente novamente.");
+  } finally {
+    setEnviando(false);
+  }
+}
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -80,6 +121,8 @@ export default function ModalAvaliarLoja({ isOpen, onClose, nomeLoja = "Rare Bea
         <textarea 
           placeholder="Avaliação da loja" 
           rows={10}
+          value={comentario}
+          onChange={(e) => setComentario(e.target.value)}
           className="w-full bg-white rounded-2xl p-6 text-sm text-gray-700 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#7C3AED] mb-8"
         />
 
@@ -87,8 +130,12 @@ export default function ModalAvaliarLoja({ isOpen, onClose, nomeLoja = "Rare Bea
         {/* BOTÃO AVALIAR                              */}
         {/* ========================================== */}
         <div className="flex justify-center">
-          <button className="bg-[#7C3AED] w-[80%] text-white font-medium text-lg py-3.5 rounded-full shadow-md hover:bg-purple-700 transition-colors cursor-pointer">
-            Avaliar
+          <button 
+            onClick={handleSubmit}
+            disabled={enviando}
+            className="bg-[#7C3AED] w-[80%] text-white font-medium text-lg py-3.5 rounded-full shadow-md hover:bg-purple-700 transition-colors cursor-pointer"
+          >
+            {enviando ? "Enviando..." : "Avaliar"}
           </button>
         </div>
 
