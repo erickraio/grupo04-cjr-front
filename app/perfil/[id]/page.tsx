@@ -12,6 +12,8 @@ const cameraImg = "/camera.png";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
+
+
 function resolverUrl(url: string, fallback = '/produto-placeholder.png'): string {
   if (!url) return fallback;
   if (url.startsWith('http')) return url;
@@ -53,7 +55,39 @@ function PerfilContent() {
   // ESTADOS DAS MODAIS DE LOJA AQUI
   const [isAddLojaModalOpen, setIsAddLojaModalOpen] = useState(false);
   const [isEditLojaModalOpen, setIsEditLojaModalOpen] = useState(false); // <-- ADICIONADO
-  const [lojaSelecionada, setLojaSelecionada] = useState<any>(null);     // <-- ADICIONADO
+  const [lojaSelecionada, setLojaSelecionada] = useState<any>(null); 
+  const [modalEdicaoAberto, setModalEdicaoAberto] = useState(false);
+  const [avaliacaoEditando, setAvaliacaoEditando] = useState<any>(null);
+  const [textoAvaliacao, setTextoAvaliacao] = useState('');
+
+  const handleSalvarAvaliacaoEditada = async () => {
+    if (!avaliacaoEditando) return;
+    const token = localStorage.getItem("@StockIO:token");
+
+    const rota = avaliacaoEditando.id_loja ? 'aval-loja' : 'avaliacao';
+
+  try {
+    const res = await fetch(`$API_URL/${rota}/${avaliacaoEditando.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({comentario: textoAvaliacao}),
+    });
+
+    if (res.ok){
+      setModalEdicaoAberto(false);
+      alert("Avaliação editada com sucesso!");
+      window.location.reload();
+    } else {
+      alert("Erro ao editar avaliação. Tente novamente.");
+    } 
+  } catch (error) {
+    console.error(error);
+  }
+  };
+
 
   const handleSalvarSenha = async () => {
     if (novaSenha !== confirmarSenha) {
@@ -267,7 +301,10 @@ function PerfilContent() {
             <h2 className="text-3xl font-bold text-black mb-6">Produtos</h2>
             <div className="flex gap-6 overflow-x-auto pb-4">
               {produtos.map((prod: any) => (
-                <div key={prod.id} className="min-w-[220px] bg-white rounded-3xl p-4 shadow-sm flex flex-col items-center border border-gray-100">
+                <div key={prod.id} 
+                  onClick={() => router.push(`/produtos/${prod.id}`)}
+
+                  className="min-w-[220px] bg-white rounded-3xl p-4 shadow-sm flex flex-col items-center border border-gray-100 cursor-pointer hover:shadow-md hover:border-purple-200 transition-all">
                   <div className="w-full h-48 bg-gray-100 rounded-2xl mb-4 overflow-hidden flex items-center justify-center">
                     <img 
                       src={prod.imagens && prod.imagens.length > 0 ? prod.imagens[0].url_imagem : "/produto-placeholder.png"} 
@@ -305,10 +342,15 @@ function PerfilContent() {
                     key={loja.id} 
                     // EVENTO DE CLIQUE ADICIONADO AQUI 👇
                     onClick={() => {
-                      setLojaSelecionada({ id: loja.id, nome: loja.nome, categoria: 'beleza' });
-                      setIsEditLojaModalOpen(true);
+                      if (isOwner){
+                        setLojaSelecionada({ id: loja.id, nome: loja.nome, categoria: 'beleza' });
+                        setIsEditLojaModalOpen(true);
+                      }
                     }}
-                    className="min-w-[400px] bg-white rounded-3xl p-6 shadow-sm flex justify-between items-center border border-gray-100 cursor-pointer hover:border-purple-200 transition-all shrink-0"
+                    className={`min-w-[400px] bg-white rounded-3xl p-6 shadow-sm flex justify-between items-center border border-gray-100 shrink-0 transition-all ${
+                        isOwner ? 'cursor-pointer hover:border-purple-200' : 'cursor-default'
+                    }`}
+                    
                   >
                     <div>
                       <h3 className="text-3xl font-light text-black">{loja.nome}</h3>
@@ -347,12 +389,29 @@ function PerfilContent() {
                   {av.id_loja ? 'Avaliação de Loja' : 'Avaliação de Produto'}
                 </span>
               </div>
-              <div className="flex gap-1 text-yellow-400">
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1 text-yellow-400">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} size={20} fill={i < av.nota ? "currentColor" : "none"} strokeWidth={i < av.nota ? 0 : 1} stroke="currentColor" />
                 ))}
               </div>
+              </div>
+
             </div>
+
+            {isOwner &&  (
+              <button
+                onClick={() => {
+                  setAvaliacaoEditando(av);
+                  setTextoAvaliacao(av.comentario);
+                  setModalEdicaoAberto(true);
+                }}
+                className="w-[24px] h-[24px] bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition"
+              >
+                <Image src="/images/lapis2.png"alt="Editar" width={14} height={14} />
+              </button>
+            )}
+
             <p className="text-gray-700 mt-3 mb-4 text-base leading-relaxed">{av.comentario}</p>
             
             <div className="flex justify-end">
@@ -521,6 +580,36 @@ function PerfilContent() {
         onClose={() => setIsAddLojaModalOpen(false)} 
         userId={userData.id} 
       />
+      
+      {modalEdicaoAberto && (
+
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+
+          <div className="bg-[#ebebeb] w-full max-w-[650px] rounded-[2.5rem] p-10 flex flex-col items-center gap-6 relative shadow-2xl">
+
+            <button onClick={() => setModalEdicaoAberto(false)} className="absolute top-6 right-6 text-black hover:opacity-60 text-3xl font-light">✕</button>
+
+
+
+            <div className="w-full mt-4 bg-white rounded-2xl p-6 min-h-[220px] shadow-inner flex flex-col">
+
+              <textarea value={textoAvaliacao} onChange={(e) => setTextoAvaliacao(e.target.value)} placeholder="Comentário" className="w-full flex-1 outline-none resize-none text-gray-700 text-base font-light" />
+
+            </div>
+
+
+
+            <div className="w-full flex flex-col gap-4 mt-2 px-12">
+
+              <button onClick={handleSalvarAvaliacaoEditada} className="w-full py-3 bg-[#6A38F3] text-white font-semibold rounded-full shadow-lg text-sm tracking-wider uppercase hover:opacity-90 transition">Salvar</button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
 
       <ModalEditarLoja 
         isOpen={isEditLojaModalOpen} 
