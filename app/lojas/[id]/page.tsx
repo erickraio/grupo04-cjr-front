@@ -32,9 +32,13 @@ export default function Loja() {
   const [modalEdicaoAberto, setModalEdicaoAberto] = useState(false);
   const [modalavaliacaoAberto, setModalAvaliacaoAberto] = useState(false);
 
+  const [usuarioLogado, setUsuarioLogado] = useState(false);
+  
+
   useEffect(() => {
     const token = localStorage.getItem('@StockIO:token');
     if (token) {
+      setUsuarioLogado(true);
     try {
       const decoded: any = jwtDecode(token);
 
@@ -117,6 +121,22 @@ export default function Loja() {
     )
   }
 
+  const avaliacoes = loja.avaliacoes || [];
+  const totalavaliacoes = avaliacoes.length;
+
+  const mediaNota = totalavaliacoes > 0 
+  ? avaliacoes.reduce((acc: number, curr: any) => acc + curr.nota, 0) / totalavaliacoes
+  : 0;
+
+  const estrelas = Array.from({length: 5}, (_, index) => {
+    const numeroEstrela = index + 1;
+
+    if (mediaNota >= numeroEstrela) {
+      return 100;
+    } else if (mediaNota > numeroEstrela - 1 ){
+      return Math.round((mediaNota - (numeroEstrela - 1)) * 100);
+    } return 0;
+  })
   return (
     <div className="min-h-screen bg-[#f6f3e4]">
       <div className="absolute top-0 left-0 w-full z-50">
@@ -132,20 +152,45 @@ export default function Loja() {
           className="object-cover"
           priority
         />
-
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/60" />
-        
         <div className="absolute z-10 flex flex-col items-center text-center mt-12">
           <h1 className="text-6xl md:text-7xl font-semibold text-white tracking-wide drop-shadow-md">
             {loja?.nome}
+            {loja?.descricao && (
+              <p className="text-lg text-white mt-2">{loja.descricao}</p>
+            )}
           </h1>
           
-          <div className="flex gap-1 mt-3 text-[#FBBF24] text-xl">
-            <span>
-              {`${"★".repeat(loja?.estrelas || 0)}${"☆".repeat(5 - (loja?.estrelas || 0))}`}
-            </span>
-            <span>
-              ({loja?.avaliacoes?.length || 0} {loja?.avaliacoes?.length === 1 ? 'Avaliação' : 'Avaliações'})
+          <div className="flex gap-3 items-center text-xl">
+            <div className="flex gap-1">
+              {estrelas.map((porcentagem, i) => {
+                const gradienteId = `loja-${loja?.id || 'nova'}-gradiente-${i}`; 
+                
+                return (
+                <svg
+                  key={i}
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  stroke="#151d29"
+                  strokeWidth="1"
+                >
+                  <defs>
+                    <linearGradient id={gradienteId} x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset={`${porcentagem}%`} stopColor="#FBBF24"/>
+                      <stop offset={`${porcentagem}%`} stopColor="#D1D5DB"/>
+                    </linearGradient>
+                  </defs>
+                  <polygon
+                    points="12,0 14.6,8.4 23.5,8.4 16.3,13.7 19,21.8 12,16.8 5,21.8 7.7,13.7 0.5,8.4 9.4,8.4"
+                    fill={`url(#${gradienteId})`}
+                    />
+                </svg>
+                );
+              })}
+            </div>
+            <span className="text-sm font-bold text-[#FBBF24]">
+              {mediaNota.toFixed(1)} / 5 ({totalavaliacoes === 1 ? 'Avaliação' : 'Avaliações'})
             </span>
           </div>
         </div>
@@ -173,10 +218,11 @@ export default function Loja() {
           <div className="flex flex-col mt-20 gap-6">
             <div className="flex items-center gap-4">
 <h2 className="text-3xl font-extrabold text-gray-900">Avaliações</h2>
-      <button
-        onClick={() => setModalAvaliacaoAberto(true)}
-        className="w-[36px] h-[36px] bg-[#fcfbf7] rounded-full flex items-center justify-center hover:bg-gray-200 transition cursor-pointer"
-          >
+      {usuarioLogado && (
+        <button
+          onClick={() => setModalAvaliacaoAberto(true)}
+          className="w-[36px] h-[36px] bg-[#6A38F3] rounded-full flex items-center justify-center hover:bg-gray-200 transition cursor-pointer"
+        >
           <Image
             src="/images/mais.png"
             alt="Adicionar Avaliação"
@@ -184,7 +230,8 @@ export default function Loja() {
             height={18}
           />
       </button>
-            </div>
+        )}
+      </div>
   
   <div
     ref={avaliacoesRef}
