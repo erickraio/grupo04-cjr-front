@@ -10,6 +10,15 @@ import Image from 'next/image';
 
 const cameraImg = "/camera.png";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+function resolverUrl(url: string, fallback = '/produto-placeholder.png'): string {
+  if (!url) return fallback;
+  if (url.startsWith('http')) return url;
+  if (url.startsWith('/images')) return url;
+  return `${API_URL}${url}`;
+}
+
 function CameraIcon() {
   return (
     <Image 
