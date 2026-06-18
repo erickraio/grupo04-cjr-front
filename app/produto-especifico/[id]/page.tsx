@@ -88,9 +88,11 @@ export default function ProdutosEspecificos() {
   const [produtosMesmaLoja, setProdutosMesmaLoja] = useState<Produto[]>([]);
   const [usuarioLogadoId, setUsuarioLogadoId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [adicionando, setAdicionando] = useState(false);
 
   // Modais
   const [modalEditarProdutoOpen, setModalEditarProdutoOpen] = useState(false);
+
   const [modalAvaliacaoOpen, setModalAvaliacaoOpen] = useState(false);
   const [avaliacaoSelecionada, setAvaliacaoSelecionada] = useState<Avaliacao | null>(null);
   const [modalCriarOpen, setModalCriarOpen] = useState(false);
@@ -134,6 +136,34 @@ export default function ProdutosEspecificos() {
       setProdutosMesmaLoja(todos.filter((p) => p.id_loja === idLoja && p.id !== idAtual));
     } catch {
       console.error("Erro ao buscar produtos da mesma loja");
+    }
+  }
+
+  async function adicionarAoCarrinho() {
+    if (!produto) return;
+    setAdicionando(true);
+    
+    try {
+      const token = getToken();
+      const res = await fetch(`${API_URL}/carrinho`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ produtoId: produto.id, quantidade: 1 }),
+      });
+
+      if (res.ok) {
+        router.push("/carrinho");
+      } else {
+        alert("Ops! Deu um erro ao adicionar no carrinho.");
+        setAdicionando(false);
+      }
+    } catch (error) {
+      console.error("Erro ao adicionar ao carrinho:", error);
+      alert("Erro de conexão ao tentar adicionar ao carrinho.");
+      setAdicionando(false);
     }
   }
 
@@ -247,11 +277,21 @@ export default function ProdutosEspecificos() {
               <span className="text-[#6A38F3]">{produto?.estoque ?? 0} disponíveis</span>
             </div>
 
-            <p className="text-5xl font-bold text-gray-900">
-              R${produto ? Number(produto.preco).toFixed(2).replace(".", ",") : "0,00"}
-            </p>
+            <div className="flex flex-col gap-4">
+              <p className="text-5xl font-bold text-gray-900">
+                R${produto ? Number(produto.preco).toFixed(2).replace(".", ",") : "0,00"}
+              </p>
+              
+              <button 
+                onClick={adicionarAoCarrinho}
+                disabled={!produto || produto.estoque === 0 || adicionando}
+                className="w-full md:w-[70%] bg-[#6A38F3] hover:bg-[#5B1EE0] text-white py-4 rounded-xl font-extrabold text-lg flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {produto?.estoque === 0 ? "Produto Esgotado" : adicionando ? "Adicionando..." : "Adicionar ao Carrinho ➔"}
+              </button>
+            </div>
 
-            <div className="flex flex-col gap-2 mt-4">
+            <div className="flex flex-col gap-2 mt-2">
               <h3 className="font-bold text-xl text-gray-800 uppercase tracking-wide">Descrição</h3>
               <div className="text-gray-700 leading-relaxed overflow-y-auto max-h-[220px] pr-1">
                 <p>{produto?.descricao ?? ""}</p>
@@ -280,6 +320,13 @@ export default function ProdutosEspecificos() {
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/perfil/${avaliacao.id_usuario}`);
+                      }}
+                      className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 cursor-pointer hover:opacity-80 transition"
+                    >
                       <img
                         src={avaliacao.usuario?.foto_perfil_url || "/images/rosto.png"}
                         alt={avaliacao.usuario?.nome ?? "usuário"}
@@ -376,6 +423,8 @@ function CardProduto({ data }: { data: Produto }) {
   const logoLoja = data.loja?.logo_url
     ? resolverUrl(data.loja.logo_url)
     : "/images/cjr.png";
+  ? `${API_URL}${data.imagens[0].url_imagem}`
+  : IMAGE_FALLBACK;
 
   return (
     <div className="bg-white rounded-[2rem] p-5 shadow-sm flex flex-col gap-3 border border-transparent hover:border-gray-200 transition-all cursor-pointer relative">
