@@ -4,17 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import Navbar from "./components/navbar";
 import Image from "next/image";
 
-// ==========================================
-// COMPONENTE PRINCIPAL (PÁGINA)
 import Searchbar from "./components/searchbar";
 import axios from "axios";
 import Link from "next/link";
 import CardProdutos from "./components/CardProdutos";
-// ==========================================
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-// Função para resolver o caminho correto da imagem
 function resolverUrl(url: string | undefined): string {
   if (!url) return '';
   if (url.startsWith('http')) return url;
@@ -35,14 +31,10 @@ export default function Home() {
   const [menuFiltroAberto, setMenuFiltroAberto] = useState(false);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<number | null>(null);
 
-  // ==========================================
-  // CONFIGURAÇÃO DOS REFS E LOGICA DE ARRASTAR
-  // ==========================================
   const categoriasRef = useRef<HTMLDivElement>(null);
   const produtosRef = useRef<HTMLDivElement>(null);
   const lojasRef = useRef<HTMLDivElement>(null);
 
-  // Lógica do Clique e Arrasta
   const criarFuncoesCarrossel = (ref: React.RefObject<HTMLDivElement | null>) => {
     const handleMouseDown = (e: React.MouseEvent) => {
       const el = ref.current;
@@ -80,7 +72,6 @@ export default function Home() {
   const eventosProdutos = criarFuncoesCarrossel(produtosRef);
   const eventosLojas = criarFuncoesCarrossel(lojasRef);
 
-  // EFEITO MÁGICO: Trava o scroll vertical da página quando estiver rolando o carrossel
   useEffect(() => {
     const applyWheelListener = (ref: React.RefObject<HTMLDivElement | null>) => {
       const el = ref.current;
@@ -110,9 +101,6 @@ export default function Home() {
       if (cleanupLoj) cleanupLoj();
     };
   }, []);
-  // ==========================================
-
-  // Função para mapear o nome da categoria para o ícone correto
   const getCategoriaIcone = (nome: string) => {
     const nomeFormatado = nome.toLowerCase();
 
