@@ -15,7 +15,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const IMAGE_FALLBACK = "/images/brownie.png";
 
 // ── Resolve qualquer formato de URL de imagem ──────────────
-function resolverUrl(url: string): string {
+function resolverUrl(url?: string): string {
   if (!url) return IMAGE_FALLBACK;
   if (url.startsWith("http")) return url;        // URL completa
   if (url.startsWith("/images")) return url;     // imagem local Next.js
@@ -331,7 +331,7 @@ export default function ProdutosEspecificos() {
                         className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 cursor-pointer hover:opacity-80 transition"
                       >
                         <img
-                          src={avaliacao.usuario?.foto_perfil_url || "/images/rosto.png"}
+                          src={resolverUrl(avaliacao.usuario?.foto_perfil_url) || "/images/rosto.png"}
                           alt={avaliacao.usuario?.nome ?? "usuário"}
                           className="w-full h-full object-cover"
                         />

@@ -7,6 +7,15 @@ import CardProduto from '../../components/CardProdutos';
 import Image from 'next/image';
 import { AnyCaaRecord } from 'dns';
 import CardAvaliacao from '../../components/CardAvaliacoes';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+function resolverUrl(url?: string): string {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  if (url.startsWith('/images')) return url;
+  return `${API_URL}${url}`;
+}
 import {jwtDecode} from 'jwt-decode';
 import ModalEditarAvaliacao from '../../components/ModalEditarAvaliacao';
 import ModalAvaliarLoja from '../../components/ModalAvaliarLoja';
@@ -146,7 +155,7 @@ export default function Loja() {
       <div className="relative w-full h-[480px] flex items-center justify-center overflow-hidden">
 
         <Image
-          src={loja?.banner_url || '/images/steambanner.jpg'}
+          src={resolverUrl(loja?.banner_url) || '/images/steambanner.jpg'}
           alt={`Banner da loja ${loja?.nome}`}
           fill
           className="object-cover"

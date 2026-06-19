@@ -3,6 +3,15 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+function resolverUrl(url?: string): string {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  if (url.startsWith('/images')) return url;
+  return `${API_URL}${url}`;
+}
+
 export default function CardProduto({ data }: { data: any }) {
   const isDisponivel = data.estoque > 0;
   const urlImagem = data?.imagens?.[0]?.url_imagem || '/images/steamdeck.png';
@@ -14,14 +23,14 @@ export default function CardProduto({ data }: { data: any }) {
       {/* Botão arredondado da Loja (estilo espelhado da tela de Lojas) */}
       <Link href={`/lojas/${data.id_loja}`}>
         <div className="absolute top-4 right-4 w-[50px] h-[50px] rounded-full flex items-center justify-center shadow-sm border-[4px] border-[#F6F5ED] bg-black text-white font-bold text-center overflow-hidden cursor-pointer hover:scale-105 transition-transform z-10">
-          <img src={logoLoja} alt="Logo da loja" className="w-full h-full object-cover" />
+          <img src={resolverUrl(logoLoja)} alt="Logo da loja" className="w-full h-full object-cover" />
         </div>
       </Link>
 
       {/* Link para o Produto */}
       <Link href={`/produto-especifico/${data.id}`} className="block">
         <div className="w-full h-36 bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center">
-          <img src={urlImagem} alt={data.nome} className="w-full h-full object-contain p-2" />
+          <img src={resolverUrl(urlImagem)} alt={data.nome} className="w-full h-full object-contain p-2" />
         </div>
 
         <div className="flex flex-col gap-1 mt-1">

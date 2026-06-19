@@ -4,6 +4,15 @@ import React from 'react';
 import Image from 'next/image';
 import {useRouter} from 'next/navigation';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+function resolverUrl(url?: string): string {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  if (url.startsWith('/images')) return url;
+  return `${API_URL}${url}`;
+}
+
 interface CardAvaliacaoProps {
   data: any;
   usuarioLogadoId?: number; 
@@ -32,7 +41,7 @@ export default function CardAvaliacao({ data, usuarioLogadoId, abrirModalEdicao,
             className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 cursor-pointer hover:opacity-80 transition"
           >
             <img
-              src={data.usuario?.foto_perfil_url || "/images/rosto.png"}
+              src={resolverUrl(data.usuario?.foto_perfil_url) || "/images/rosto.png"}
               alt={data.usuario?.nome ?? "usuário"}
               className="w-full h-full object-cover"
             />

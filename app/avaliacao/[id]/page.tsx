@@ -14,7 +14,12 @@ import Image from 'next/image';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-
+function resolverUrl(url?: string): string {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  if (url.startsWith('/images')) return url;
+  return `${API_URL}${url}`;
+}
 
 function getToken(): string | null {
 
@@ -339,7 +344,7 @@ export default function TelaAvaliacaoIdentica() {
 
               >
 
-                <img src={dados?.usuario?.foto_perfil_url || "/images/rosto.png"} alt="Perfil" className="w-full h-full object-cover" />
+                <img src={resolverUrl(dados?.usuario?.foto_perfil_url) || "/images/rosto.png"} alt="Perfil" className="w-full h-full object-cover" />
 
               </div>
 
@@ -406,7 +411,7 @@ export default function TelaAvaliacaoIdentica() {
 
           >
 
-            <img src={sub.usuario?.foto_perfil_url || "/images/rosto.png"} alt="Foto" className="w-full h-full object-cover" />
+            <img src={resolverUrl(sub.usuario?.foto_perfil_url) || "/images/rosto.png"} alt="Foto" className="w-full h-full object-cover" />
 
           </div>
 

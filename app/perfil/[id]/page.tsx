@@ -127,52 +127,54 @@ function PerfilContent() {
     }
   };
 
-  useEffect(() => {
-    async function fetchPerfil() {
-      try {
-        const token = localStorage.getItem("@StockIO:token");
-        const urlId = params?.id as string; 
-        
-        if (!token && !urlId) {
-          router.push('/login');
-          return;
-        }
-        let loggedInUserId = null;
-        if (token) {
-          try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            loggedInUserId = payload.sub || payload.id;
-          } catch (jwtError) {
-            console.error("Erro ao decodificar token antigo/inválido:", jwtError);
-            localStorage.removeItem("@StockIO:token");
-          }
-        }
-        const targetUserId = urlId ? parseInt(urlId) : loggedInUserId;
-        if (!targetUserId) {
-          router.push('/login');
-          return;
-        }
-        setIsOwner(loggedInUserId !== null && targetUserId === loggedInUserId);
-        const headers: HeadersInit = {};
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-        const response = await fetch(`http://localhost:3001/user/${targetUserId}`, { headers });
-        if (!response.ok) throw new Error("Usuário não encontrado");
-        const data = await response.json();
-        setUserData(data);
-        setEditNome(data.nome || '');
-        setEditUsername(data.username || '');
-        setEditEmail(data.email || '');
-        setEditFotoUrl(data.foto_perfil_url || '');
-      } catch (error) {
-        console.error("Erro ao carregar perfil:", error);
-        setUserData(null);
-      } finally {
-        setLoading(false);
+  async function carregarPerfil() {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("@StockIO:token");
+      const urlId = params?.id as string; 
+      
+      if (!token && !urlId) {
+        router.push('/login');
+        return;
       }
+      let loggedInUserId = null;
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          loggedInUserId = payload.sub || payload.id;
+        } catch (jwtError) {
+          console.error("Erro ao decodificar token antigo/inválido:", jwtError);
+          localStorage.removeItem("@StockIO:token");
+        }
+      }
+      const targetUserId = urlId ? parseInt(urlId) : loggedInUserId;
+      if (!targetUserId) {
+        router.push('/login');
+        return;
+      }
+      setIsOwner(loggedInUserId !== null && targetUserId === loggedInUserId);
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const response = await fetch(`http://localhost:3001/user/${targetUserId}`, { headers });
+      if (!response.ok) throw new Error("Usuário não encontrado");
+      const data = await response.json();
+      setUserData(data);
+      setEditNome(data.nome || '');
+      setEditUsername(data.username || '');
+      setEditEmail(data.email || '');
+      setEditFotoUrl(data.foto_perfil_url || '');
+      setLoading(false);
+    } catch (error) {
+      console.error("Erro ao carregar perfil:", error);
+      setUserData(null);
+      setLoading(false);
     }
-    fetchPerfil();
+  }
+
+  useEffect(() => {
+    carregarPerfil();
   }, [router, params?.id]); 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -270,7 +272,7 @@ function PerfilContent() {
         <div className="absolute -top-24 left-10 z-10">
           <div className="w-48 h-48 rounded-full border-4 border-[#f6f3e4] overflow-hidden bg-gray-300 shadow-md">
             <img 
-              src={userData.foto_perfil_url || "/default-avatar.png"} 
+              src={resolverUrl(userData.foto_perfil_url) || "/default-avatar.png"} 
               alt={userData.nome} 
               className="w-full h-full object-cover"
             />
@@ -307,7 +309,7 @@ function PerfilContent() {
                   className="min-w-[220px] bg-white rounded-3xl p-4 shadow-sm flex flex-col items-center border border-gray-100 cursor-pointer hover:shadow-md hover:border-purple-200 transition-all">
                   <div className="w-full h-48 bg-gray-100 rounded-2xl mb-4 overflow-hidden flex items-center justify-center">
                     <img 
-                      src={prod.imagens && prod.imagens.length > 0 ? prod.imagens[0].url_imagem : "/produto-placeholder.png"} 
+                      src={prod.imagens && prod.imagens.length > 0 ? resolverUrl(prod.imagens[0].url_imagem) : "/produto-placeholder.png"} 
                       alt={prod.nome} 
                       className="w-full h-full object-cover" 
                     />
@@ -357,7 +359,7 @@ function PerfilContent() {
                       <p className="text-[#7c3aed] text-lg font-medium mt-1">beleza</p> 
                     </div>
                     <div className="w-24 h-24 rounded-full bg-[#fdf8f6] flex items-center justify-center border border-pink-100 overflow-hidden shrink-0">
-                      {loja.logo_url ? <img src={loja.logo_url} alt="Logo" className="w-full h-full object-cover"/> : <span className="text-xs text-pink-800 text-center px-2">{loja.nome}</span>}
+                      {loja.logo_url ? <img src={resolverUrl(loja.logo_url)} alt="Logo" className="w-full h-full object-cover"/> : <span className="text-xs text-pink-800 text-center px-2">{loja.nome}</span>}
                     </div>
                   </div>
                 ))}
@@ -378,7 +380,7 @@ function PerfilContent() {
       ).map((av: any) => (
         <div key={av.id_loja ? `loja-${av.id}` : `produto-${av.id}`} className="bg-white rounded-3xl p-6 shadow-sm flex gap-6 border border-gray-100">
           <div className="w-20 h-20 rounded-full overflow-hidden shrink-0 bg-gray-200 border-2 border-white shadow-sm">
-             <img src={userData.foto_perfil_url || "/default-avatar.png"} alt={userData.nome} className="w-full h-full object-cover" />
+             <img src={resolverUrl(userData.foto_perfil_url) || "/default-avatar.png"} alt={userData.nome} className="w-full h-full object-cover" />
 
           </div>
           <div className="w-full">
@@ -579,6 +581,7 @@ function PerfilContent() {
         isOpen={isAddLojaModalOpen} 
         onClose={() => setIsAddLojaModalOpen(false)} 
         userId={userData.id} 
+        onLojaCriada={carregarPerfil}
       />
       
       {modalEdicaoAberto && (
