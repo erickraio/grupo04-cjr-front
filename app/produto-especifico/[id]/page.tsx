@@ -395,6 +395,8 @@ export default function ProdutosEspecificos() {
       <ModalEditarProduto
         isOpen={modalEditarProdutoOpen}
         onClose={() => setModalEditarProdutoOpen(false)}
+        produtoId={PRODUTO_ID}
+        onProdutoAtualizado={fetchProduto}
       />
 
       {/* Modal criar avaliação */}

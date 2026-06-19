@@ -65,7 +65,7 @@ grupo04-cjr-front/
 │   │   └── page.tsx              # Carrinho de compras
 │   ├── categoria/
 │   │   └── [id]/
-│   │       └── page.tsx          # Página de categoria — ⚠️ DADOS MOCKADOS
+│   │       └── page.tsx          # Página de categoria — ✅ INTEGRADO COM API
 │   ├── produto-especifico/
 │   │   └── [id]/
 │   │       └── page.tsx          # Detalhe do produto
@@ -270,13 +270,13 @@ export const registerUser = (userData) => api.post('/user/register', userData);
 - [x] Criar loja (modal com upload banner/logo/foto)
 - [x] Perfil do usuário (foto, dados, editar, alterar senha, excluir conta)
 - [x] Logout (limpa token, redireciona)
+- [x] Página de categoria (`/categoria/[id]`) — **dados reais via API: hero dinâmico, subcategorias, grid com CardProdutos, busca local, ordenação, paginação real, lojas, populares e recentes**
 
 ### ⚠️ Parcialmente Implementado
 
 - [x] Editar produto (ModalEditarProduto) — **UI existe, sem chamada API**
 - [x] Editar loja (ModalEditarLoja) — **UI existe, sem chamada API**
 - [x] Editar avaliação de loja — **callback vazio, não atualiza lista**
-- [x] Página de categoria (`/categoria/[id]`) — **dados mockados, sem API**
 
 ### ❌ Não Implementado
 
@@ -328,21 +328,20 @@ Páginas que **não existem** mas são referenciadas ou têm suporte total no ba
 
 ## 9. Páginas com Dados Mockados
 
-### 9.1 `/categoria/[id]`
+### 9.1 `/categoria/[id]` — ✅ INTEGRADO (18/06/2026)
 
 **Localização:** `app/categoria/[id]/page.tsx`
 
-**Problemas:**
-- Produtos, lojas, populares e recentes são **dados mockados hardcoded**
-- Paginação (botões 1-5) é visual apenas
-- Filtro "ordenar por" não funcional
-- Input de busca não wireado
-
-**O que integrar:**
-- `GET /category/:id` para nome e ícone da categoria
-- `GET /produtos` (com filtro por nome ou categoria)
-- `GET /lojas` para listar lojas relacionadas
-- Wirear ordenação, paginação e busca
+**O que foi implementado:**
+- Hero com nome real da categoria via `GET /category/:id`
+- Subcategorias dinâmicas com filtro ativo ao clicar
+- Grid de produtos reais filtrados por `id_categoria`, usando `<CardProdutos />`
+- Busca local por nome no input
+- Ordenação por menor/maior preço funcional
+- Paginação real (10 itens/página) com controles anterior/próximo
+- Lojas reais da API com logo ou fallback por inicial
+- Seções "Mais populares" (top 8 por estoque) e "Recém adicionados" (top 8 por `created_at`)
+- Estados de loading, erro (com botão "Tentar novamente") e vazio
 
 ---
 
@@ -470,7 +469,7 @@ Funcionalidades que o backend **já implementa** mas o frontend **não consome**
 
 | Prioridade | Ação | Esforço |
 |:----------:|------|:-------:|
-| 🔴 Alta | Integrar dados reais na página `/categoria/[id]` | Médio |
+| ~~🔴 Alta~~ | ~~Integrar dados reais na página `/categoria/[id]`~~ | ~~Médio — ✅ Feito~~ |
 | 🔴 Alta | Criar páginas de recuperação/redefinição de senha | Médio |
 | 🔴 Alta | Criar página de checkout + chamar finalizar compra | Médio |
 | 🟡 Média | Wirear ModalEditarProduto com PATCH/DELETE | Pequeno |
