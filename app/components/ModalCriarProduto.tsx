@@ -88,11 +88,27 @@ export default function ModalCriarProduto({
   }
 
   // ── Submit ────────────────────────────────────────────────
+  // ── Submit ────────────────────────────────────────────────
   async function handleAdicionar() {
     if (!nome.trim() || !preco) {
       alert('Nome e preço são obrigatórios!');
       return;
     }
+    
+    if (!subcategoria) {
+      alert('Por favor, selecione uma subcategoria!');
+      return;
+    }
+
+    // Limpa o preço de possíveis "R$" ou letras, convertendo a vírgula em ponto
+    const precoLimpo = preco.replace(/[^\d,.-]/g, '').replace(',', '.');
+    const precoFinal = parseFloat(precoLimpo);
+
+    if (isNaN(precoFinal)) {
+      alert('Por favor, insira um preço válido (ex: 49,90).');
+      return;
+    }
+
     setCarregando(true);
     try {
       const token = getToken();
@@ -107,16 +123,18 @@ export default function ModalCriarProduto({
         body: JSON.stringify({
           nome,
           descricao,
-          preco: parseFloat(preco.replace(',', '.')),
+          preco: precoFinal,
           estoque,
           id_loja: idLoja,
           id_categoria: Number(subcategoria),
         }),
       });
-   if (!resProduto.ok) {
-  const errorData = await resProduto.json();
-  throw new Error(JSON.stringify(errorData));
-}
+
+      if (!resProduto.ok) {
+        const errorData = await resProduto.json();
+        throw new Error(errorData.message || 'Erro ao criar o produto.');
+      }
+      
       const produtoCriado = await resProduto.json();
 
       // 2. Upload das imagens em sequência
@@ -124,11 +142,11 @@ export default function ModalCriarProduto({
       for (let i = 0; i < todasImagens.length; i++) {
         const formData = new FormData();
         formData.append('imagem', todasImagens[i]);
-        formData.append('id_produto', String(produtoCriado.id));
         formData.append('ordem', String(i + 1));
+        
         await fetch(`${API_URL}/produtos/${produtoCriado.id}/imagens`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` }, // Sem Content-Type, o browser define o boundary do FormData automaticamente
           body: formData,
         });
       }
