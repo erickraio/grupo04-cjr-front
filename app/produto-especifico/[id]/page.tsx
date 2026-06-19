@@ -8,7 +8,8 @@ import Link from "next/link";
 
 import ModalCriarAvaliacao from "@/app/components/ModalCriarAvaliacao";
 import ModalEditarAvaliacao from "../../components/ModalEditarAvaliacao";
-import ModalCriarProduto from "@/app/components/ModalCriarProduto";
+import ModalEditarProduto from "@/app/components/ModalEditarProduto";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const IMAGE_FALLBACK = "/images/brownie.png";
@@ -312,26 +313,29 @@ export default function ProdutosEspecificos() {
             onMouseMove={(e) => onDrag(e, avaliacoesRef)}
             className={`flex flex-row gap-6 overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] select-none ${isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x"}`}
           >
+           
             {avaliacoes.map((avaliacao) => (
-              <div
-                key={avaliacao.id}
-                className="bg-[#fcfbf7] hover:bg-[#f5f4ef] transition-colors rounded-[2.5rem] p-8 min-w-[450px] shadow-sm snap-start flex flex-col gap-4 border border-gray-100 cursor-pointer"
-              >
-                <div className="flex justify-between items-center">
+              <Link href={`/avaliacao/${avaliacao.id}`} key={avaliacao.id}>
+                <div
+                  key={avaliacao.id}
+                  className="bg-[#fcfbf7] hover:bg-[#f5f4ef] transition-colors rounded-[2.5rem] p-8 min-w-[450px] shadow-sm snap-start flex flex-col gap-4 border border-gray-100 cursor-pointer"
+                >
+                  <div className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/perfil/${avaliacao.id_usuario}`);
-                      }}
-                      className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 cursor-pointer hover:opacity-80 transition"
-                    >
-                      <img
-                        src={avaliacao.usuario?.foto_perfil_url || "/images/rosto.png"}
-                        alt={avaliacao.usuario?.nome ?? "usuário"}
-                        className="w-full h-full object-cover"
-                      />
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/perfil/${avaliacao.id_usuario}`);
+                        }}
+                        className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 cursor-pointer hover:opacity-80 transition"
+                      >
+                        <img
+                          src={avaliacao.usuario?.foto_perfil_url || "/images/rosto.png"}
+                          alt={avaliacao.usuario?.nome ?? "usuário"}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
                     <p className="font-bold text-xl text-gray-900">
                       {avaliacao.usuario?.nome ?? avaliacao.usuario?.username ?? "Usuário"}
@@ -355,7 +359,9 @@ export default function ProdutosEspecificos() {
                 </div>
                 <p className="text-gray-700 text-lg">{avaliacao.comentario}</p>
               </div>
+              </Link>
             ))}
+            
 
             {avaliacoes.length === 0 && (
               <div className="text-gray-500 italic mt-4">Nenhuma avaliação ainda. Seja o primeiro!</div>
@@ -386,11 +392,9 @@ export default function ProdutosEspecificos() {
       </div>
 
       {/* ── 3. Modal editar produto (só abre para dono da loja) ── */}
-      <ModalCriarProduto
+      <ModalEditarProduto
         isOpen={modalEditarProdutoOpen}
         onClose={() => setModalEditarProdutoOpen(false)}
-        idLoja={produto?.id_loja ?? 0}
-        onProdutoCriado={fetchProduto}
       />
 
       {/* Modal criar avaliação */}
@@ -423,8 +427,6 @@ function CardProduto({ data }: { data: Produto }) {
   const logoLoja = data.loja?.logo_url
     ? resolverUrl(data.loja.logo_url)
     : "/images/cjr.png";
-  ? `${API_URL}${data.imagens[0].url_imagem}`
-  : IMAGE_FALLBACK;
 
   return (
     <div className="bg-white rounded-[2rem] p-5 shadow-sm flex flex-col gap-3 border border-transparent hover:border-gray-200 transition-all cursor-pointer relative">

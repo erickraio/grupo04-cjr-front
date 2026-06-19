@@ -138,7 +138,7 @@ export default function Home() {
             <div className="flex gap-4 md:gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
               {categorias.map((categoria: any) => (
                 <div key={categoria.id} className="flex flex-col items-center gap-3 min-w-[110px] cursor-pointer group">
-
+                <Link href={`/categoria/${categoria.id}`} key={categoria.id}>
                   {/* Quadrado Branco do Ícone */}
                   <div className="w-[100px] h-[100px] bg-white rounded-[2rem] flex items-center justify-center shadow-[0px_4px_15px_rgba(0,0,0,0.03)] border border-transparent group-hover:border-indigo-100 transition-colors">
                     <Image
@@ -149,6 +149,7 @@ export default function Home() {
                       className="object-contain"
                     />
                   </div>
+                  </Link>
 
                   {/* Nome da Categoria */}
                   <span className="text-[15px] font-semibold text-black">{categoria.nome}</span>
