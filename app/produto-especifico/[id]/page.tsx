@@ -4,12 +4,22 @@ import { useRef, useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Navbar from "../../components/navbar";
 import Image from "next/image";
+import Link from "next/link";
 
 import ModalCriarAvaliacao from "@/app/components/ModalCriarAvaliacao";
 import ModalEditarAvaliacao from "../../components/ModalEditarAvaliacao";
+import ModalCriarProduto from "@/app/components/ModalCriarProduto";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const IMAGE_FALLBACK = "/images/brownie.png";
+
+// ── Resolve qualquer formato de URL de imagem ──────────────
+function resolverUrl(url: string): string {
+  if (!url) return IMAGE_FALLBACK;
+  if (url.startsWith("http")) return url;        // URL completa
+  if (url.startsWith("/images")) return url;     // imagem local Next.js
+  return `${API_URL}${url}`;                     // caminho relativo do backend
+}
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -33,6 +43,13 @@ type ImagemProduto = {
   id_produto: number;
 };
 
+type Loja = {
+  id: number;
+  id_dono: number;
+  nome: string;
+  logo_url?: string;
+};
+
 type Produto = {
   id: number;
   nome: string;
@@ -40,6 +57,7 @@ type Produto = {
   preco: number;
   estoque: number;
   id_loja: number;
+  loja?: Loja;
   categoria?: { nome: string };
   imagens?: ImagemProduto[];
 };
@@ -70,10 +88,10 @@ export default function ProdutosEspecificos() {
   const [produtosMesmaLoja, setProdutosMesmaLoja] = useState<Produto[]>([]);
   const [usuarioLogadoId, setUsuarioLogadoId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [adicionando, setAdicionando] = useState(false);
 
+  // Modais
   const [modalEditarProdutoOpen, setModalEditarProdutoOpen] = useState(false);
-
-  // Estados dos modais de avaliação (agora extraídos para componentes próprios)
   const [modalAvaliacaoOpen, setModalAvaliacaoOpen] = useState(false);
   const [avaliacaoSelecionada, setAvaliacaoSelecionada] = useState<Avaliacao | null>(null);
   const [modalCriarOpen, setModalCriarOpen] = useState(false);
@@ -120,6 +138,34 @@ export default function ProdutosEspecificos() {
     }
   }
 
+  async function adicionarAoCarrinho() {
+    if (!produto) return;
+    setAdicionando(true);
+    
+    try {
+      const token = getToken();
+      const res = await fetch(`${API_URL}/carrinho`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ produtoId: produto.id, quantidade: 1 }),
+      });
+
+      if (res.ok) {
+        router.push("/carrinho");
+      } else {
+        alert("Ops! Deu um erro ao adicionar no carrinho.");
+        setAdicionando(false);
+      }
+    } catch (error) {
+      console.error("Erro ao adicionar ao carrinho:", error);
+      alert("Erro de conexão ao tentar adicionar ao carrinho.");
+      setAdicionando(false);
+    }
+  }
+
   function abrirModalEdicao(avaliacao: Avaliacao) {
     setAvaliacaoSelecionada(avaliacao);
     setModalAvaliacaoOpen(true);
@@ -152,15 +198,24 @@ export default function ProdutosEspecificos() {
     );
   }
 
+  // ── Imagens resolvidas ─────────────────────────────────────
   const listaImagens = produto?.imagens && produto.imagens.length > 0
-  ? produto.imagens.map((img) => `${API_URL}${img.url_imagem}`)
-  : [IMAGE_FALLBACK];
+    ? produto.imagens.map((img) => resolverUrl(img.url_imagem))
+    : [IMAGE_FALLBACK];
+
+  // ── Logo da loja ───────────────────────────────────────────
+  const logoLoja = produto?.loja?.logo_url
+    ? resolverUrl(produto.loja.logo_url)
+    : "/images/cjr.png";
+
+  // ── Lógica de dono da loja ────────────────────────────────
+  const isDonoDaLoja = usuarioLogadoId !== null && produto?.loja?.id_dono === usuarioLogadoId;
 
   return (
-    <div className="bg-[#f6f3e4] dark:bg-[#1A1A1A] min-h-screen pb-12 flex flex-col items-center font-sans transition-colors duration-300">
+    <div className="bg-[#f6f3e4] dark:bg-[#1A1A1A] min-h-screen pb-12 font-sans transition-colors duration-300">
       <Navbar />
 
-      <div className="w-full max-w-[1200px] px-8 flex flex-col gap-16 mt-24">
+      <div className="w-full max-w-[1200px] mx-auto px-8 flex flex-col gap-16 mt-24">
 
         {/* Bloco 1: Produto */}
         <div className="flex flex-col md:flex-row gap-12">
@@ -172,15 +227,20 @@ export default function ProdutosEspecificos() {
                   onClick={() => setSelectedThumb(i)}
                   className={`w-[130px] h-[120px] bg-white dark:bg-[#2A2A2A] rounded-2xl shadow-sm overflow-hidden border-2 transition-all flex-shrink-0 ${selectedThumb === i ? "border-[#6A38F3]" : "border-transparent hover:border-gray-300 dark:hover:border-gray-600"}`}
                 >
-                  <Image src={src} alt={`imagem ${i + 1}`} width={130} height={120} className="w-full h-full object-cover" />
+                  <img src={src} alt={`imagem ${i + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
 
             <div className="flex-1 bg-white dark:bg-[#2A2A2A] rounded-3xl shadow-sm relative overflow-hidden flex items-center justify-center transition-colors duration-300">
-              <Image src={listaImagens[selectedThumb] || IMAGE_FALLBACK} alt="Produto principal" fill className="object-contain p-4" />
+              <img src={listaImagens[selectedThumb] || IMAGE_FALLBACK} alt="Produto principal" className="object-contain p-4 w-full h-full" />
+              {/* ── 1. Logo da loja puxada do banco ── */}
               <div className="absolute top-4 right-4 w-[52px] h-[52px] rounded-full overflow-hidden shadow-md border-2 border-white dark:border-[#2A2A2A] z-10 transition-colors duration-300">
-                <Image src="/images/cjr.png" alt="Logo CJR" width={52} height={52} className="w-full h-full object-cover" />
+                <Link href={`/lojas/${produto?.loja?.id}`}>
+                  <div className="w-full h-full cursor-pointer hover:scale-105 transition-transform">
+                    <img src={logoLoja} alt="Logo da loja" className="w-full h-full object-cover" />
+                  </div>
+                </Link>
               </div>
             </div>
           </div>
@@ -189,12 +249,15 @@ export default function ProdutosEspecificos() {
             <div className="flex justify-between items-start">
               <h1 className="text-4xl font-extrabold text-[#000000] dark:text-white transition-colors duration-300">{produto?.nome ?? "Produto"}</h1>
               <div className="flex gap-2">
-                <button
-                  onClick={() => setModalEditarProdutoOpen(true)}
-                  className="w-[27px] h-[27px] bg-[#6A38F3] rounded-full flex items-center justify-center hover:opacity-80 transition"
-                >
-                  <Image src="/images/lapis1.png" alt="lapis" width={17} height={17} />
-                </button>
+                {/* ── 2. Lápis roxo só para dono da loja ── */}
+                {isDonoDaLoja && (
+                  <button
+                    onClick={() => setModalEditarProdutoOpen(true)}
+                    className="w-[27px] h-[27px] bg-[#6A38F3] rounded-full flex items-center justify-center hover:opacity-80 transition"
+                  >
+                    <Image src="/images/lapis1.png" alt="lapis" width={17} height={17} />
+                  </button>
+                )}
                 <button
                   onClick={() => setModalCriarOpen(true)}
                   className="w-[27px] h-[27px] bg-[#C6E700] rounded-full flex items-center justify-center hover:opacity-80 transition"
@@ -213,9 +276,19 @@ export default function ProdutosEspecificos() {
               <span className="text-[#6A38F3] dark:text-[#9b73f8] transition-colors duration-300">{produto?.estoque ?? 0} disponíveis</span>
             </div>
 
-            <p className="text-5xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
-              R${produto ? Number(produto.preco).toFixed(2).replace(".", ",") : "0,00"}
-            </p>
+            <div className="flex flex-col gap-4">
+              <p className="text-5xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
+                R${produto ? Number(produto.preco).toFixed(2).replace(".", ",") : "0,00"}
+              </p>
+              
+              <button 
+                onClick={adicionarAoCarrinho}
+                disabled={!produto || produto.estoque === 0 || adicionando}
+                className="w-full md:w-[70%] bg-[#6A38F3] hover:bg-[#5B1EE0] text-white py-4 rounded-xl font-extrabold text-lg flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {produto?.estoque === 0 ? "Produto Esgotado" : adicionando ? "Adicionando..." : "Adicionar ao Carrinho ➔"}
+              </button>
+            </div>
 
             <div className="flex flex-col gap-2 mt-4">
               <h3 className="font-bold text-xl text-gray-800 dark:text-gray-200 uppercase tracking-wide transition-colors duration-300">Descrição</h3>
@@ -246,7 +319,6 @@ export default function ProdutosEspecificos() {
               >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
-                    {/* Avatar leva ao perfil do usuário que avaliou */}
                     <div
                       onClick={(e) => {
                         e.stopPropagation();
@@ -312,8 +384,15 @@ export default function ProdutosEspecificos() {
         )}
       </div>
 
-      {/* Modal de criação e edição mantêm as suas chamadas normais */}
-      
+      {/* ── 3. Modal editar produto (só abre para dono da loja) ── */}
+      <ModalCriarProduto
+        isOpen={modalEditarProdutoOpen}
+        onClose={() => setModalEditarProdutoOpen(false)}
+        idLoja={produto?.id_loja ?? 0}
+        onProdutoCriado={fetchProduto}
+      />
+
+      {/* Modal criar avaliação */}
       <ModalCriarAvaliacao
         isOpen={modalCriarOpen}
         onClose={() => setModalCriarOpen(false)}
@@ -322,6 +401,7 @@ export default function ProdutosEspecificos() {
         onAvaliacaoCriada={fetchAvaliacoes}
       />
 
+      {/* Modal editar avaliação */}
       <ModalEditarAvaliacao
         isOpen={modalAvaliacaoOpen}
         onClose={() => setModalAvaliacaoOpen(false)}
@@ -335,14 +415,18 @@ export default function ProdutosEspecificos() {
 
 function CardProduto({ data }: { data: Produto }) {
   const isDisponivel = data.estoque > 0;
- const imagemCard = data.imagens && data.imagens.length > 0
-  ? `${API_URL}${data.imagens[0].url_imagem}`
-  : IMAGE_FALLBACK;
+  const imagemCard = data.imagens && data.imagens.length > 0
+    ? resolverUrl(data.imagens[0].url_imagem)
+    : IMAGE_FALLBACK;
+
+  const logoLoja = data.loja?.logo_url
+    ? resolverUrl(data.loja.logo_url)
+    : "/images/cjr.png";
 
   return (
     <div className="bg-white dark:bg-[#2A2A2A] rounded-[2rem] p-5 shadow-sm flex flex-col gap-3 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all cursor-pointer relative">
       <div className="absolute top-4 right-4 w-[48px] h-[48px] bg-white dark:bg-[#3A3A3A] rounded-full overflow-hidden shadow-sm flex items-center justify-center z-10 transition-colors duration-300">
-        <Image src="/images/cjr.png" alt="Logo cjr" width={48} height={48} className="w-full h-full object-cover" />
+        <img src={logoLoja} alt="Logo da loja" className="w-full h-full object-cover" />
       </div>
       <div className="w-full h-36 bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden flex items-center justify-center relative transition-colors duration-300">
         <img src={imagemCard} alt={data.nome} className="w-full h-full object-contain p-2" />

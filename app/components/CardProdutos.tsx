@@ -1,36 +1,55 @@
 'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+// ── Resolve qualquer formato de URL de imagem ──────────────
+function resolverUrl(url: string): string {
+  if (!url) return '/images/steamdeck.png';
+  if (url.startsWith("http")) return url;        
+  if (url.startsWith("/images")) return url;     
+  return `${API_URL}${url}`;                     
+}
+
 export default function CardProduto({ data }: { data: any }) {
-  // Ajustando para os nomes prováveis do backend (banco de dados)
-  const isDisponivel = data.estoque > 0; // Exemplo: se tem quantidade, está disponível
-
-  const urlImagem = data?.imagens?.[0]?.url_imagem || '/images/steamdeck.png'; // Imagem do produto ou placeholder
+  const isDisponivel = data.estoque > 0;
   
-  return (
-     <Link href={`/produto-especifico/${data.id}`}> 
-    <div className="bg-white dark:bg-[#2A2A2A] rounded-3xl p-4 md:p-5 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] flex flex-col relative border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300 cursor-pointer">
-      
-      {/* Área da Imagem do Produto (Espaço Disponível) */}
-      <div className="relative w-full h-[160px] bg-gray-50 dark:bg-gray-800 rounded-2xl mb-4 flex items-center justify-center text-gray-300 dark:text-gray-500 text-xs mt-4 transition-colors duration-300">
-         <Image src={urlImagem} alt={data.nome} fill className="object-contain" />
-      </div>
+  const urlImagem = data?.imagens?.[0]?.url_imagem 
+    ? resolverUrl(data.imagens[0].url_imagem) 
+    : '/images/steamdeck.png';
+    
+  const logoLoja = data.loja?.logo_url 
+    ? resolverUrl(data.loja.logo_url) 
+    : "/images/cjr.png";
 
-      {/* Informações de Texto */}
-      <div className="flex flex-col gap-1">
-        <h3 className="text-xl font-bold text-black dark:text-white leading-tight truncate transition-colors duration-300">{data.nome}</h3>
-        
-        <p className="text-xl font-bold text-black dark:text-white flex items-baseline gap-1 mt-1 transition-colors duration-300">
-          R$ {data.preco} 
-        </p>
-        
-        <span className={`text-[11px] font-bold mt-1 tracking-wide transition-colors duration-300 ${isDisponivel ? 'text-[#B5D400] dark:text-[#D4F514]' : 'text-[#E53E3E] dark:text-[#FF4D6D]'}`}>
-          {isDisponivel ? 'DISPONÍVEL' : 'INDISPONÍVEL'}
-        </span>
-      </div>
+  return (
+    <div className="bg-white dark:bg-[#2A2A2A] rounded-[2rem] p-5 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] flex flex-col relative border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300 h-full">
+      
+      {/* Botão arredondado da Loja (estilo espelhado da tela de Lojas) */}
+      <Link href={`/lojas/${data.id_loja}`}>
+        <div className="absolute top-4 right-4 w-[50px] h-[50px] rounded-full flex items-center justify-center shadow-sm border-[4px] border-[#F6F5ED] dark:border-[#1A1A1A] bg-black dark:bg-[#3A3A3A] text-white font-bold text-center overflow-hidden cursor-pointer hover:scale-105 transition-transform z-10">
+          <img src={logoLoja} alt="Logo da loja" className="w-full h-full object-cover" />
+        </div>
+      </Link>
+
+      {/* Link para o Produto */}
+      <Link href={`/produto-especifico/${data.id}`} className="block">
+        <div className="w-full h-36 bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden flex items-center justify-center transition-colors duration-300">
+          <img src={urlImagem} alt={data.nome} className="w-full h-full object-contain p-2" />
+        </div>
+
+        <div className="flex flex-col gap-1 mt-1">
+          <h3 className="font-extrabold text-lg text-gray-900 dark:text-white truncate transition-colors duration-300">{data.nome}</h3>
+          <p className="font-bold text-xl text-gray-900 dark:text-white transition-colors duration-300">R${Number(data.preco).toFixed(2).replace(".", ",")}</p>
+          <p className={`text-xs font-bold mt-1 uppercase transition-colors duration-300 ${isDisponivel ? "text-[#C6E700] dark:text-[#D4F514]" : "text-[#AF052A] dark:text-[#FF4D6D]"}`}>
+            {isDisponivel ? "DISPONÍVEL" : "INDISPONÍVEL"}
+          </p>
+        </div>
+      </Link>
+      
     </div>
-    </Link>
   );
 }

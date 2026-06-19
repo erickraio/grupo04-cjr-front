@@ -1,6 +1,7 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
-import { User, LogOut, Sun, Moon } from 'lucide-react';
+import { User, LogOut, Sun, Moon, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
@@ -28,7 +29,7 @@ export default function Navbar() {
     useEffect(() => {
         setMounted(true); // Evita erros de hidratação entre servidor e cliente
         const token = localStorage.getItem("@StockIO:token");
-        if (token){
+        if (token) {
             setLogado(true);
         }
         setUserId(getUserIdFromToken());
@@ -38,7 +39,7 @@ export default function Navbar() {
         localStorage.removeItem("@StockIO:token");
         setLogado(false);
         router.push("/login");
-    }
+    };
 
     return (
         <nav className="flex justify-between items-center bg-black dark:bg-[#111111] px-10 h-[70px] w-full box-border select-none transition-colors duration-300">
@@ -67,6 +68,15 @@ export default function Navbar() {
                 {/* Lógica de Autenticação */}
                 {logado ? (
                     <div className="flex items-center gap-6">
+                        {/* Ícone do Carrinho */}
+                        <button 
+                            onClick={() => router.push('/carrinho')}
+                            className="text-white hover:text-gray-300 transition-colors cursor-pointer"
+                            title="Carrinho"
+                        >
+                            <ShoppingCart size={22} strokeWidth={2} />
+                        </button>
+
                         <button 
                             onClick={() => router.push(`/perfil/${userId}`)}
                             className="text-white hover:text-gray-300 transition-colors cursor-pointer"
@@ -85,6 +95,15 @@ export default function Navbar() {
                     </div>
                 ) : (
                     <div className="flex items-center gap-6">
+                        {/* Ícone do Carrinho (Visitante) */}
+                        <button 
+                            onClick={() => router.push('/carrinho')}
+                            className="text-white hover:text-gray-300 transition-colors cursor-pointer mr-2"
+                            title="Carrinho"
+                        >
+                            <ShoppingCart size={22} strokeWidth={2} />
+                        </button>
+
                         <Link 
                             href="/login"
                             className="text-[#f6f3e4] hover:text-white font-bold text-sm transition-colors cursor-pointer"
