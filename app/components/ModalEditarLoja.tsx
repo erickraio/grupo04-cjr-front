@@ -99,9 +99,9 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados, onLojaAtua
       const token = getToken();
       const formData = new FormData();
       formData.append('nome', nomeLoja);
-      // Se o seu back-end espera 'id_categoria' em vez de 'categoria', altere abaixo:
-      if (categoria) formData.append('id_categoria', categoria); 
+      if (categoria) formData.append('categoria', categoria);
       
+      // Anexa as imagens se o usuário selecionou novas
       if (fotoPerfilFile) formData.append('foto_url', fotoPerfilFile);
       if (logoFile) formData.append('logo_url', logoFile);
       if (bannerFile) formData.append('banner_url', bannerFile);
