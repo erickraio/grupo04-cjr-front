@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; 
 import Navbar from "./components/navbar";
 import Image from "next/image";
 
@@ -26,6 +26,90 @@ export default function Home() {
   const [produtosFiltrados, setProdutosFiltrados] = useState<any[] | null>(null);
   const [carregando, setCarregando] = useState(false);
 
+  // 1. Estados para guardar os dados do banco
+  const [categorias, setCategorias] = useState([]);
+  const [produtos, setProdutos] = useState([]);
+  const [lojas, setLojas] = useState([]);
+
+  // ==========================================
+  // CONFIGURAÇÃO DOS REFS E LOGICA DE ARRASTAR
+  // ==========================================
+  const categoriasRef = useRef<HTMLDivElement>(null);
+  const produtosRef = useRef<HTMLDivElement>(null);
+  const lojasRef = useRef<HTMLDivElement>(null);
+
+  // Lógica do Clique e Arrasta
+  const criarFuncoesCarrossel = (ref: React.RefObject<HTMLDivElement | null>) => {
+    const handleMouseDown = (e: React.MouseEvent) => {
+      const el = ref.current;
+      if (!el) return;
+      el.dataset.isDown = 'true';
+      el.dataset.startX = String(e.pageX - el.offsetLeft);
+      el.dataset.scrollLeft = String(el.scrollLeft);
+    };
+
+    const handleMouseLeaveOrUp = () => {
+      const el = ref.current;
+      if (!el) return;
+      el.dataset.isDown = 'false';
+    };
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+      const el = ref.current;
+      if (!el || el.dataset.isDown !== 'true') return;
+      e.preventDefault();
+      
+      const x = e.pageX - el.offsetLeft;
+      const walk = (x - Number(el.dataset.startX || 0)); 
+      el.scrollLeft = Number(el.dataset.scrollLeft || 0) - walk;
+    };
+
+    return {
+      onMouseDown: handleMouseDown,
+      onMouseLeave: handleMouseLeaveOrUp,
+      onMouseUp: handleMouseLeaveOrUp,
+      onMouseMove: handleMouseMove,
+      // Removemos o onWheel daqui para tratar direto no useEffect abaixo!
+    };
+  };
+
+  const eventosCategorias = criarFuncoesCarrossel(categoriasRef);
+  const eventosProdutos = criarFuncoesCarrossel(produtosRef);
+  const eventosLojas = criarFuncoesCarrossel(lojasRef);
+
+  // EFEITO MÁGICO: Trava o scroll vertical da página quando estiver rolando o carrossel
+  useEffect(() => {
+    const applyWheelListener = (ref: React.RefObject<HTMLDivElement | null>) => {
+      const el = ref.current;
+      if (!el) return;
+
+      const handleNativeWheel = (e: WheelEvent) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault(); // <-- TRAVA O SCROLL DA PÁGINA AQUI!
+          el.scrollLeft += e.deltaY; // Rola o carrossel horizontalmente
+        }
+      };
+
+      // O "passive: false" é o que permite o e.preventDefault() funcionar no scroll
+      el.addEventListener('wheel', handleNativeWheel, { passive: false });
+
+      return () => {
+        el.removeEventListener('wheel', handleNativeWheel);
+      };
+    };
+
+    const cleanupCat = applyWheelListener(categoriasRef);
+    const cleanupProd = applyWheelListener(produtosRef);
+    const cleanupLoj = applyWheelListener(lojasRef);
+
+    return () => {
+      if (cleanupCat) cleanupCat();
+      if (cleanupProd) cleanupProd();
+      if (cleanupLoj) cleanupLoj();
+    };
+  }, []);
+  // ==========================================
+
   // Função para mapear o nome da categoria para o ícone correto
   const getCategoriaIcone = (nome: string) => {
     const nomeFormatado = nome.toLowerCase();
@@ -39,7 +123,6 @@ export default function Home() {
     if (nomeFormatado.includes('brinquedo')) return '/brinquedos-token.png';
     if (nomeFormatado.includes('casa')) return '/casas-token.png';
 
-    // Ícone padrão caso a categoria não tenha imagem específica
     return '/icon-placeholder.png';
   };
 
@@ -52,9 +135,6 @@ export default function Home() {
     try {
       const response = await axios.get(`${API_URL}/produtos?busca=${(query)}`);
       setProdutosFiltrados(response.data);
-      console.log("Busca realizada com sucesso:", response.data);
-      console.log("Termo pesquisado:", query);
-      console.log("Produtos retornados:", response.data);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
     } finally {
@@ -62,28 +142,20 @@ export default function Home() {
     }
   };
   
-  // 1. Estados para guardar os dados do banco
-  const [categorias, setCategorias] = useState([]);
-  const [produtos, setProdutos] = useState([]);
-  const [lojas, setLojas] = useState([]);
-
-  // 2. Efeito para buscar os dados ao carregar a página
+  // Efeito para buscar os dados ao carregar a página
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        // Dispara as três requisições ao mesmo tempo
         const [resCategorias, resProdutos, resLojas] = await Promise.all([
           fetch(`${API_URL}/category`),
           fetch(`${API_URL}/produtos`),
           fetch(`${API_URL}/lojas`)
         ]);
 
-        // Converte as respostas para JSON
         const dataCategorias = await resCategorias.json();
         const dataProdutos = await resProdutos.json();
         const dataLojas = await resLojas.json();
 
-        // Atualiza os estados com os dados reais
         setCategorias(dataCategorias);
         setProdutos(dataProdutos);
         setLojas(dataLojas);
@@ -95,7 +167,6 @@ export default function Home() {
 
     carregarDados();
   }, []);
-
 
   return (
     <main className="min-h-screen bg-[#f6f3e4] dark:bg-[#1A1A1A] transition-colors duration-300">
@@ -139,11 +210,14 @@ export default function Home() {
           <div>
             <h2 className="text-2xl font-bold text-black dark:text-white mb-6 transition-colors">Categoria</h2>
 
-            <div className="flex gap-4 md:gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
+            <div 
+              ref={categoriasRef}
+              {...eventosCategorias}
+              className="flex gap-4 md:gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide cursor-grab active:cursor-grabbing select-none"
+            >
               {categorias.map((categoria: any) => (
-                <Link href={`/categoria/${categoria.id}`} key={categoria.id}>
-                  <div className="flex flex-col items-center gap-3 min-w-[110px] cursor-pointer group">
-
+                <Link href={`/categoria/${categoria.id}`} key={categoria.id} draggable="false">
+                  <div className="flex flex-col items-center gap-3 min-w-[110px] cursor-pointer group pointer-events-none">
                     {/* Quadrado Branco/Escuro do Ícone */}
                     <div className="w-[100px] h-[100px] bg-white dark:bg-[#2A2A2A] rounded-[2rem] flex items-center justify-center shadow-[0px_4px_15px_rgba(0,0,0,0.03)] border border-transparent group-hover:border-indigo-100 dark:group-hover:border-gray-600 transition-colors">
                       <Image
@@ -152,9 +226,9 @@ export default function Home() {
                         width={46}
                         height={46}
                         className="object-contain"
+                        draggable="false"
                       />
                     </div>
-
                     {/* Nome da Categoria */}
                     <span className="text-[15px] font-semibold text-black dark:text-white transition-colors">{categoria.nome}</span>
                   </div>
@@ -163,10 +237,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ============================================== */}
-          {/* 3. PRODUTOS E LOJAS                            */}
-          {/* ============================================== */}
-
           {/* Produtos: Todos */}
           <div className="mt-4">
             <div className="flex items-baseline gap-3 mb-6">
@@ -174,15 +244,18 @@ export default function Home() {
               <span className="text-sm font-medium text-[#7C3AED] dark:text-[#9b73f8] transition-colors">todos</span>
             </div>
 
-            <div className="flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
+            <div 
+              ref={produtosRef}
+              {...eventosProdutos}
+              className="flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide cursor-grab active:cursor-grabbing select-none"
+            >
               {Array.isArray(produtos) && produtos.map((produto: any) => (
-                <div key={produto.id} className="min-w-[220px] md:min-w-[260px]">
+                <div key={produto.id} className="min-w-[220px] md:min-w-[260px]" draggable="false">
                   <CardProdutos data={produto} />
                 </div>
               ))}
             </div>
           </div>
-
 
           {/* Secção Lojas */}
           <div className="mt-12 mb-20">
@@ -199,18 +272,22 @@ export default function Home() {
             </div>
 
             {/* Lista Horizontal de Lojas */}
-            <div className="flex gap-6 md:gap-10 overflow-x-auto pb-4 scrollbar-hide">
+            <div 
+              ref={lojasRef}
+              {...eventosLojas}
+              className="flex gap-6 md:gap-10 overflow-x-auto pb-4 scrollbar-hide cursor-grab active:cursor-grabbing select-none"
+            >
               {lojas.map((loja: any) => (
-                <Link href={`/lojas/${loja.id}`} key={loja.id}>
-                  <div className="flex flex-col items-center gap-3 min-w-[130px] cursor-pointer">
-
+                <Link href={`/lojas/${loja.id}`} key={loja.id} draggable="false">
+                  <div className="flex flex-col items-center gap-3 min-w-[130px] cursor-pointer pointer-events-none">
                     {/* Círculo da Loja com Imagem Dinâmica */}
-                    <div className={`w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] dark:border-[#1A1A1A] bg-black text-white font-bold text-center overflow-hidden transition-colors`}>
+                    <div className="w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] dark:border-[#1A1A1A] bg-black text-white font-bold text-center overflow-hidden transition-colors">
                       {loja.logo_url ? (
                         <img 
                           src={resolverUrl(loja.logo_url)} 
                           alt={`Logo ${loja.nome}`} 
                           className="w-full h-full object-cover" 
+                          draggable="false"
                         />
                       ) : (
                         <span className="p-2">{loja.nome}</span>
