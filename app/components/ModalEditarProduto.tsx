@@ -95,7 +95,8 @@ export default function ModalEditarProduto({
       const imgs = (produto.imagens || []).sort((a: ImagemProduto, b: ImagemProduto) => a.ordem - b.ordem);
       setImagensExistentes(imgs);
 
-      setCategorias(cats || []);
+      const subcategorias = (cats || []).flatMap((cat: any) => cat.subcategorias || []);
+      setCategorias(subcategorias);
       setNovasImagens([null, null, null, null]);
       setPrevsImagens([null, null, null, null]);
     } catch {

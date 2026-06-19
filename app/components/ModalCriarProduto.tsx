@@ -36,15 +36,14 @@ export default function ModalCriarProduto({
   // ── Categorias do banco ───────────────────────────────────
   const [categorias, setCategorias] = useState<{ id: number; nome: string }[]>([]);
 
- useEffect(() => {
+  useEffect(() => {
     async function fetchCategorias() {
       try {
         const res = await fetch(`${API_URL}/category`);
-        console.log('Status categorias:', res.status);
         const data = await res.json();
-        console.log('Dados categorias:', data);
         if (!res.ok) throw new Error();
-        setCategorias(data);
+        const subcategorias = data.flatMap((cat: any) => cat.subcategorias || []);
+        setCategorias(subcategorias);
       } catch {
         console.error('Erro ao buscar categorias');
       }
