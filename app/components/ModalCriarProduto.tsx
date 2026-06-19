@@ -41,15 +41,21 @@ export default function ModalCriarProduto({
       try {
         const res = await fetch(`${API_URL}/category`);
         const data = await res.json();
-        if (!res.ok) throw new Error();
-        const subcategorias = data.flatMap((cat: any) => cat.subcategorias || []);
-        setCategorias(subcategorias);
-      } catch {
-        console.error('Erro ao buscar categorias');
+        
+        if (!res.ok) throw new Error('Falha na resposta da API');
+        
+        console.log("Categorias recebidas do Back-end:", data);
+        
+        setCategorias(data);
+      } catch (error) {
+        console.error('Erro ao buscar categorias:', error);
       }
     }
-    fetchCategorias();
-  }, []);
+
+    if (isOpen) {
+      fetchCategorias();
+    }
+  }, [isOpen]); // <-- O array deve ser sempre [isOpen]
 
   // ── Imagens ───────────────────────────────────────────────
   const [imgPrincipal, setImgPrincipal]         = useState<File | null>(null);
