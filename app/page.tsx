@@ -12,6 +12,16 @@ import Link from "next/link";
 import CardProdutos from "./components/CardProdutos";
 // ==========================================
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+// Função para resolver o caminho correto da imagem
+function resolverUrl(url: string | undefined): string {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  if (url.startsWith('/images')) return url;
+  return `${API_URL}${url}`;
+}
+
 export default function Home() {
   const [produtosFiltrados, setProdutosFiltrados] = useState<any[] | null>(null);
   const [carregando, setCarregando] = useState(false);
@@ -40,7 +50,7 @@ export default function Home() {
     }
     setCarregando(true);
     try {
-      const response = await axios.get(`http://localhost:3001/produtos?busca=${(query)}`);
+      const response = await axios.get(`${API_URL}/produtos?busca=${(query)}`);
       setProdutosFiltrados(response.data);
       console.log("Busca realizada com sucesso:", response.data);
       console.log("Termo pesquisado:", query);
@@ -61,23 +71,17 @@ export default function Home() {
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
         // Dispara as três requisições ao mesmo tempo
         const [resCategorias, resProdutos, resLojas] = await Promise.all([
-          fetch(`${baseUrl}/category`),
-          fetch(`${baseUrl}/produtos`),
-          fetch(`${baseUrl}/lojas`)
+          fetch(`${API_URL}/category`),
+          fetch(`${API_URL}/produtos`),
+          fetch(`${API_URL}/lojas`)
         ]);
 
         // Converte as respostas para JSON
         const dataCategorias = await resCategorias.json();
         const dataProdutos = await resProdutos.json();
         const dataLojas = await resLojas.json();
-
-        console.log("Categorias do Back:", dataCategorias);
-        console.log("Produtos do Back:", dataProdutos);
-        console.log("Lojas do Back:", dataLojas); 
 
         // Atualiza os estados com os dados reais
         setCategorias(dataCategorias);
@@ -200,9 +204,17 @@ export default function Home() {
                 <Link href={`/lojas/${loja.id}`} key={loja.id}>
                   <div className="flex flex-col items-center gap-3 min-w-[130px] cursor-pointer">
 
-                    {/* Círculo da Loja */}
-                    <div className={`w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] dark:border-[#1A1A1A] bg-black text-white font-bold text-center p-2 transition-colors`}>
-                      <span>{loja.nome}</span>
+                    {/* Círculo da Loja com Imagem Dinâmica */}
+                    <div className={`w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] dark:border-[#1A1A1A] bg-black text-white font-bold text-center overflow-hidden transition-colors`}>
+                      {loja.logo_url ? (
+                        <img 
+                          src={resolverUrl(loja.logo_url)} 
+                          alt={`Logo ${loja.nome}`} 
+                          className="w-full h-full object-cover" 
+                        />
+                      ) : (
+                        <span className="p-2">{loja.nome}</span>
+                      )}
                     </div>
 
                     <div className="flex flex-col items-center leading-tight">

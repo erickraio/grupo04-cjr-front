@@ -20,8 +20,8 @@ function resolverUrl(url: string | undefined): string {
 interface ModalEditarLojaProps {
   isOpen: boolean;
   onClose: () => void;
-  lojaDados?: any; // Recebe os dados atuais da loja
-  onLojaAtualizada?: () => void; // Função para recarregar a página
+  lojaDados?: any;
+  onLojaAtualizada?: () => void;
 }
 
 export default function ModalEditarLoja({ isOpen, onClose, lojaDados, onLojaAtualizada }: ModalEditarLojaProps) {
@@ -60,12 +60,10 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados, onLojaAtua
       setNomeLoja(lojaDados.nome || '');
       setIdCategoria(String(lojaDados.id_categoria || ''));
       
-      // Carrega imagens já existentes no banco
       setPreviewFoto(resolverUrl(lojaDados.foto_url));
       setPreviewLogo(resolverUrl(lojaDados.logo_url));
       setPreviewBanner(resolverUrl(lojaDados.banner_url));
 
-      // Limpa os arquivos para não reenviar se não mudar
       setFotoPerfilFile(null);
       setLogoFile(null);
       setBannerFile(null);
@@ -85,7 +83,6 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados, onLojaAtua
 
   if (!isOpen) return null;
 
-  // Handlers para gerar Previews locais instantâneos
   const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       setFotoPerfilFile(e.target.files[0]);
@@ -116,12 +113,14 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados, onLojaAtua
     try {
       const token = getToken();
       const formData = new FormData();
-      formData.append('nome', nomeLoja);
-      if (idCategoria) formData.append('id_categoria', idCategoria); 
       
-      if (fotoPerfilFile) formData.append('foto', fotoPerfilFile);
-      if (logoFile) formData.append('logo', logoFile);
-      if (bannerFile) formData.append('banner', bannerFile);
+      // 1. Envia o nome (A loja não possui categoria no banco, então omitimos o id_categoria)
+      formData.append('nome', nomeLoja);
+      
+      // 2. CORREÇÃO: Usar os nomes exatos esperados pelo Back-end
+      if (fotoPerfilFile) formData.append('foto_url', fotoPerfilFile);
+      if (logoFile) formData.append('logo_url', logoFile);
+      if (bannerFile) formData.append('banner_url', bannerFile);
 
       const response = await fetch(`${API_URL}/lojas/${lojaDados.id}`, {
         method: 'PATCH',
@@ -134,7 +133,7 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados, onLojaAtua
       alert("Loja atualizada com sucesso!");
       onClose();
       if (onLojaAtualizada) onLojaAtualizada();
-      else window.location.reload(); // Fallback rápido
+      else window.location.reload(); 
     } catch (err: any) {
       console.error(err);
       alert("Não foi possível salvar as alterações.");
@@ -160,7 +159,7 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados, onLojaAtua
 
       alert("Loja apagada com sucesso.");
       onClose();
-      window.location.href = '/'; // Envia para a Home
+      window.location.href = '/'; 
     } catch (err: any) {
       console.error(err);
       alert("Erro ao tentar excluir a loja.");
