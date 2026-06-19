@@ -137,22 +137,24 @@ export default function Home() {
 
             <div className="flex gap-4 md:gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
               {categorias.map((categoria: any) => (
-                <div key={categoria.id} className="flex flex-col items-center gap-3 min-w-[110px] cursor-pointer group">
+                <Link href={`/categoria/${categoria.id}`} key={categoria.id}>
+                  <div className="flex flex-col items-center gap-3 min-w-[110px] cursor-pointer group">
 
-                  {/* Quadrado Branco/Escuro do Ícone */}
-                  <div className="w-[100px] h-[100px] bg-white dark:bg-[#2A2A2A] rounded-[2rem] flex items-center justify-center shadow-[0px_4px_15px_rgba(0,0,0,0.03)] border border-transparent group-hover:border-indigo-100 dark:group-hover:border-gray-600 transition-colors">
-                    <Image
-                      src={getCategoriaIcone(categoria.nome)}
-                      alt={`Ícone ${categoria.nome}`}
-                      width={46}
-                      height={46}
-                      className="object-contain"
-                    />
+                    {/* Quadrado Branco/Escuro do Ícone */}
+                    <div className="w-[100px] h-[100px] bg-white dark:bg-[#2A2A2A] rounded-[2rem] flex items-center justify-center shadow-[0px_4px_15px_rgba(0,0,0,0.03)] border border-transparent group-hover:border-indigo-100 dark:group-hover:border-gray-600 transition-colors">
+                      <Image
+                        src={getCategoriaIcone(categoria.nome)}
+                        alt={`Ícone ${categoria.nome}`}
+                        width={46}
+                        height={46}
+                        className="object-contain"
+                      />
+                    </div>
+
+                    {/* Nome da Categoria */}
+                    <span className="text-[15px] font-semibold text-black dark:text-white transition-colors">{categoria.nome}</span>
                   </div>
-
-                  {/* Nome da Categoria */}
-                  <span className="text-[15px] font-semibold text-black dark:text-white transition-colors">{categoria.nome}</span>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

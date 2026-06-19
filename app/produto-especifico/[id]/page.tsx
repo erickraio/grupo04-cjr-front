@@ -8,7 +8,7 @@ import Link from "next/link";
 
 import ModalCriarAvaliacao from "@/app/components/ModalCriarAvaliacao";
 import ModalEditarAvaliacao from "../../components/ModalEditarAvaliacao";
-import ModalCriarProduto from "@/app/components/ModalCriarProduto";
+import ModalEditarProduto from "@/app/components/ModalEditarProduto";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const IMAGE_FALLBACK = "/images/brownie.png";
@@ -311,6 +311,7 @@ export default function ProdutosEspecificos() {
             onMouseMove={(e) => onDrag(e, avaliacoesRef)}
             className={`flex flex-row gap-6 overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] select-none ${isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x"}`}
           >
+           
             {avaliacoes.map((avaliacao) => (
               <div
                 key={avaliacao.id}
@@ -355,7 +356,7 @@ export default function ProdutosEspecificos() {
                 <p className="text-gray-700 dark:text-gray-300 text-lg transition-colors duration-300">{avaliacao.comentario}</p>
               </div>
             ))}
-
+            
             {avaliacoes.length === 0 && (
               <div className="text-gray-500 dark:text-gray-400 italic mt-4 transition-colors duration-300">Nenhuma avaliação ainda. Seja o primeiro!</div>
             )}
@@ -385,11 +386,11 @@ export default function ProdutosEspecificos() {
       </div>
 
       {/* ── 3. Modal editar produto (só abre para dono da loja) ── */}
-      <ModalCriarProduto
+      <ModalEditarProduto
         isOpen={modalEditarProdutoOpen}
         onClose={() => setModalEditarProdutoOpen(false)}
-        idLoja={produto?.id_loja ?? 0}
-        onProdutoCriado={fetchProduto}
+        produtoId={PRODUTO_ID}
+        onProdutoAtualizado={fetchProduto}
       />
 
       {/* Modal criar avaliação */}
