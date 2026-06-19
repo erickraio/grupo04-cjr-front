@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Navbar from "./components/navbar";
 import Image from "next/image";
 
-
 // ==========================================
 // COMPONENTE PRINCIPAL (PÁGINA)
 import Searchbar from "./components/searchbar";
@@ -52,6 +51,7 @@ export default function Home() {
       setCarregando(false);
     }
   };
+  
   // 1. Estados para guardar os dados do banco
   const [categorias, setCategorias] = useState([]);
   const [produtos, setProdutos] = useState([]);
@@ -94,13 +94,13 @@ export default function Home() {
 
 
   return (
-    <main className="min-h-screen bg-[#f6f3e4]">
+    <main className="min-h-screen bg-[#f6f3e4] dark:bg-[#1A1A1A] transition-colors duration-300">
 
       {/* NAVBAR */}
       <Navbar />
 
       {/* 1. SESSÃO PRETA (HERO)  */}
-      <section className="bg-black w-full pt-28 px-6 md:px-12 flex justify-center relative overflow-hidden">
+      <section className="bg-black dark:bg-[#111111] w-full pt-28 px-6 md:px-12 flex justify-center relative overflow-hidden transition-colors duration-300">
         <div className="max-w-6xl w-full flex flex-col md:flex-row items-center justify-between">
           <div className="w-full md:w-1/2 z-20 text-center md:text-left pb-16 md:pb-28 mt-8">
             <h1 className="text-white text-4xl md:text-5xl lg:text-[66px] font-semibold leading-[1] tracking-tight">
@@ -121,39 +121,40 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. SESSÃO BEGE (CONTEÚDO PRINCIPAL) */}
+      {/* 2. SESSÃO BEGE/ESCURA (CONTEÚDO PRINCIPAL) */}
       <section className="w-full px-6 md:px-12 py-8 flex justify-center">
         <div className="max-w-6xl w-full flex flex-col gap-12">
 
           {/* Barra de Pesquisa */}
           <div className="flex flex-col items-end w-full gap-2">
             <Searchbar onSearch={handleSearch} produtos={produtosFiltrados} />
-            {carregando && <span className="text-sm text-[#7C3AED] animate-pulse">Buscando produtos...</span>}
+            {carregando && <span className="text-sm text-[#7C3AED] dark:text-[#9b73f8] animate-pulse">Buscando produtos...</span>}
           </div>
 
           {/* Categorias */}
           <div>
-            <h2 className="text-2xl font-bold text-black mb-6">Categoria</h2>
+            <h2 className="text-2xl font-bold text-black dark:text-white mb-6 transition-colors">Categoria</h2>
 
             <div className="flex gap-4 md:gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
               {categorias.map((categoria: any) => (
-                <div key={categoria.id} className="flex flex-col items-center gap-3 min-w-[110px] cursor-pointer group">
                 <Link href={`/categoria/${categoria.id}`} key={categoria.id}>
-                  {/* Quadrado Branco do Ícone */}
-                  <div className="w-[100px] h-[100px] bg-white rounded-[2rem] flex items-center justify-center shadow-[0px_4px_15px_rgba(0,0,0,0.03)] border border-transparent group-hover:border-indigo-100 transition-colors">
-                    <Image
-                      src={getCategoriaIcone(categoria.nome)}
-                      alt={`Ícone ${categoria.nome}`}
-                      width={46}
-                      height={46}
-                      className="object-contain"
-                    />
-                  </div>
-                  </Link>
+                  <div className="flex flex-col items-center gap-3 min-w-[110px] cursor-pointer group">
 
-                  {/* Nome da Categoria */}
-                  <span className="text-[15px] font-semibold text-black">{categoria.nome}</span>
-                </div>
+                    {/* Quadrado Branco/Escuro do Ícone */}
+                    <div className="w-[100px] h-[100px] bg-white dark:bg-[#2A2A2A] rounded-[2rem] flex items-center justify-center shadow-[0px_4px_15px_rgba(0,0,0,0.03)] border border-transparent group-hover:border-indigo-100 dark:group-hover:border-gray-600 transition-colors">
+                      <Image
+                        src={getCategoriaIcone(categoria.nome)}
+                        alt={`Ícone ${categoria.nome}`}
+                        width={46}
+                        height={46}
+                        className="object-contain"
+                      />
+                    </div>
+
+                    {/* Nome da Categoria */}
+                    <span className="text-[15px] font-semibold text-black dark:text-white transition-colors">{categoria.nome}</span>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -165,8 +166,8 @@ export default function Home() {
           {/* Produtos: Todos */}
           <div className="mt-4">
             <div className="flex items-baseline gap-3 mb-6">
-              <h2 className="text-3xl font-bold text-black">Produtos</h2>
-              <span className="text-sm font-medium text-[#7C3AED]">todos</span>
+              <h2 className="text-3xl font-bold text-black dark:text-white transition-colors">Produtos</h2>
+              <span className="text-sm font-medium text-[#7C3AED] dark:text-[#9b73f8] transition-colors">todos</span>
             </div>
 
             <div className="flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
@@ -182,10 +183,10 @@ export default function Home() {
           {/* Secção Lojas */}
           <div className="mt-12 mb-20">
             <div className="flex justify-between items-end mb-8">
-              <h2 className="text-3xl font-bold text-black">Lojas</h2>
-
+              <h2 className="text-3xl font-bold text-black dark:text-white transition-colors">Lojas</h2>
+              
               {/* Botão de Filtro */}
-              <button className="flex items-center gap-12 bg-white rounded-full px-6 py-2 shadow-sm text-[#A78BFA] font-medium text-lg border border-transparent hover:border-indigo-100 transition-all">
+              <button className="flex items-center gap-12 bg-white dark:bg-[#2A2A2A] rounded-full px-6 py-2 shadow-sm text-[#A78BFA] dark:text-[#9b73f8] font-medium text-lg border border-transparent hover:border-indigo-100 dark:hover:border-gray-600 transition-all">
                 filtros
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -200,12 +201,12 @@ export default function Home() {
                   <div className="flex flex-col items-center gap-3 min-w-[130px] cursor-pointer">
 
                     {/* Círculo da Loja */}
-                    <div className={`w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] bg-black text-white font-bold text-center p-2`}>
+                    <div className={`w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] dark:border-[#1A1A1A] bg-black text-white font-bold text-center p-2 transition-colors`}>
                       <span>{loja.nome}</span>
                     </div>
 
                     <div className="flex flex-col items-center leading-tight">
-                      <span className="text-lg font-medium text-black">{loja.nome}</span>
+                      <span className="text-lg font-medium text-black dark:text-white transition-colors duration-300">{loja.nome}</span>
                     </div>
                   </div>
                 </Link>

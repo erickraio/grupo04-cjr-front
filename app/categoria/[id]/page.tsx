@@ -108,10 +108,10 @@ export default function CategoriaEspecifica() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#F6F5ED]">
+      <main className="min-h-screen bg-[#F6F5ED] dark:bg-[#1A1A1A] transition-colors duration-300">
         <Navbar />
         <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-gray-500 text-lg animate-pulse">Carregando...</p>
+          <p className="text-gray-500 dark:text-gray-400 text-lg animate-pulse transition-colors duration-300">Carregando...</p>
         </div>
       </main>
     );
@@ -119,13 +119,13 @@ export default function CategoriaEspecifica() {
 
   if (erro) {
     return (
-      <main className="min-h-screen bg-[#F6F5ED]">
+      <main className="min-h-screen bg-[#F6F5ED] dark:bg-[#1A1A1A] transition-colors duration-300">
         <Navbar />
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-          <p className="text-gray-500 text-lg">{erro}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-lg transition-colors duration-300">{erro}</p>
           <button
             onClick={carregarDados}
-            className="bg-[#7C3AED] text-white px-6 py-2 rounded-full hover:bg-[#6A38F3] transition-colors"
+            className="bg-[#7C3AED] text-white px-6 py-2 rounded-full hover:bg-[#6A38F3] transition-colors shadow-md"
           >
             Tentar novamente
           </button>
@@ -135,7 +135,7 @@ export default function CategoriaEspecifica() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F6F5ED]">
+    <main className="min-h-screen bg-[#F6F5ED] dark:bg-[#1A1A1A] transition-colors duration-300">
       <Navbar />
 
       {/* ============================================== */}
@@ -175,9 +175,9 @@ export default function CategoriaEspecifica() {
                 placeholder="Procurar por..."
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
-                className="w-full bg-white rounded-full py-4 pl-8 pr-14 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-gray-700 placeholder:text-[#A78BFA] focus:outline-none focus:ring-2 focus:ring-[#7C3AED]"
+                className="w-full bg-white dark:bg-[#2A2A2A] rounded-full py-4 pl-8 pr-14 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-gray-700 dark:text-white placeholder:text-[#A78BFA] focus:outline-none focus:ring-2 focus:ring-[#7C3AED] transition-colors duration-300"
               />
-              <button className="absolute right-6 top-1/2 -translate-y-1/2 text-[#A78BFA] hover:text-[#7C3AED] transition-colors cursor-pointer">
+              <button className="absolute right-6 top-1/2 -translate-y-1/2 text-[#A78BFA] hover:text-[#7C3AED] dark:hover:text-[#9b73f8] transition-colors cursor-pointer">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -190,11 +190,11 @@ export default function CategoriaEspecifica() {
               {subcategorias.length > 0 && (
                 <button
                   onClick={() => setSubcategoriaSelecionada(null)}
-                  className={`px-6 py-2.5 rounded-full font-medium transition-colors cursor-pointer ${
+                  className={`px-6 py-2.5 rounded-full font-medium transition-colors cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.03)] ${
                     subcategoriaSelecionada === null
                       ? 'bg-[#7C3AED] text-white'
-                      : 'bg-white text-[#A78BFA] hover:bg-[#7C3AED] hover:text-white'
-                  } shadow-[0_4px_20px_rgba(0,0,0,0.03)]`}
+                      : 'bg-white dark:bg-[#2A2A2A] text-[#A78BFA] hover:bg-[#7C3AED] hover:text-white dark:hover:bg-[#7C3AED] dark:hover:text-white'
+                  }`}
                 >
                   Todas
                 </button>
@@ -203,11 +203,11 @@ export default function CategoriaEspecifica() {
                 <button
                   key={sub.id}
                   onClick={() => setSubcategoriaSelecionada(sub.id)}
-                  className={`px-6 py-2.5 rounded-full font-medium transition-colors cursor-pointer ${
+                  className={`px-6 py-2.5 rounded-full font-medium transition-colors cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.03)] ${
                     subcategoriaSelecionada === sub.id
                       ? 'bg-[#7C3AED] text-white'
-                      : 'bg-white text-[#A78BFA] hover:bg-[#7C3AED] hover:text-white'
-                  } shadow-[0_4px_20px_rgba(0,0,0,0.03)]`}
+                      : 'bg-white dark:bg-[#2A2A2A] text-[#A78BFA] hover:bg-[#7C3AED] hover:text-white dark:hover:bg-[#7C3AED] dark:hover:text-white'
+                  }`}
                 >
                   {sub.nome}
                 </button>
@@ -217,7 +217,7 @@ export default function CategoriaEspecifica() {
               <select
                 value={ordenarPor}
                 onChange={(e) => setOrdenarPor(e.target.value)}
-                className="appearance-none bg-white text-[#A78BFA] font-medium text-xl w-[240px] md:w-[320px] pl-8 pr-14 py-3 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#7C3AED]"
+                className="appearance-none bg-white dark:bg-[#2A2A2A] text-[#A78BFA] font-medium text-xl w-[240px] md:w-[320px] pl-8 pr-14 py-3 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#7C3AED] transition-colors duration-300"
               >
                 <option value="">ordenar por</option>
                 <option value="menor-preco">Menor Preço</option>
@@ -239,7 +239,7 @@ export default function CategoriaEspecifica() {
       <section className="w-full px-6 md:px-12 pb-20 flex justify-center">
         <div className="max-w-[1200px] w-full mt-4">
           {produtosPagina.length === 0 ? (
-            <div className="text-center py-20 text-gray-500">
+            <div className="text-center py-20 text-gray-500 dark:text-gray-400 transition-colors duration-300">
               <p className="text-lg">Nenhum produto encontrado nesta categoria.</p>
             </div>
           ) : (
@@ -251,11 +251,11 @@ export default function CategoriaEspecifica() {
               </div>
 
               {totalPaginas > 1 && (
-                <div className="w-full flex justify-center items-center gap-6 mt-16 text-2xl font-light text-gray-500">
+                <div className="w-full flex justify-center items-center gap-6 mt-16 text-2xl font-light text-gray-500 dark:text-gray-400 transition-colors duration-300">
                   <button
                     onClick={() => setPaginaAtual((p) => Math.max(1, p - 1))}
                     disabled={paginaAtual === 1}
-                    className="hover:text-black transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    className="hover:text-black dark:hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                   >
                     &lt;
                   </button>
@@ -265,8 +265,8 @@ export default function CategoriaEspecifica() {
                       onClick={() => setPaginaAtual(pag)}
                       className={`cursor-pointer transition-colors ${
                         pag === paginaAtual
-                          ? 'font-bold text-black'
-                          : 'hover:text-black'
+                          ? 'font-bold text-black dark:text-white'
+                          : 'hover:text-black dark:hover:text-white'
                       }`}
                     >
                       {pag}
@@ -275,7 +275,7 @@ export default function CategoriaEspecifica() {
                   <button
                     onClick={() => setPaginaAtual((p) => Math.min(totalPaginas, p + 1))}
                     disabled={paginaAtual === totalPaginas}
-                    className="hover:text-black transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    className="hover:text-black dark:hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                   >
                     &gt;
                   </button>
@@ -290,14 +290,14 @@ export default function CategoriaEspecifica() {
       {/* 4. PRINCIPAIS LOJAS (Fundo Preto)              */}
       {/* ============================================== */}
       {lojas.length > 0 && (
-        <section className="bg-black w-full py-16 px-6 md:px-12 flex justify-center overflow-hidden">
+        <section className="bg-black dark:bg-[#111111] w-full py-16 px-6 md:px-12 flex justify-center overflow-hidden transition-colors duration-300">
           <div className="max-w-[1200px] w-full">
             <h2 className="text-white text-3xl font-bold mb-12">Principais Lojas</h2>
             <div className="flex gap-8 md:gap-12 overflow-x-auto scrollbar-hide pb-4 items-start">
               {lojas.map((loja: any) => (
                 <Link href={`/lojas/${loja.id}`} key={loja.id}>
                   <div className="flex flex-col items-center gap-4 min-w-[120px] cursor-pointer group">
-                    <div className="w-[120px] h-[120px] bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-[#7C3AED] transition-all">
+                    <div className="w-[120px] h-[120px] bg-white dark:bg-[#2A2A2A] rounded-full flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-[#7C3AED] transition-all duration-300">
                       {loja.logo_url ? (
                         <img
                           src={resolverUrl(loja.logo_url)}
@@ -305,7 +305,7 @@ export default function CategoriaEspecifica() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span className="text-black font-bold text-lg">
+                        <span className="text-black dark:text-white font-bold text-lg transition-colors duration-300">
                           {loja.nome.charAt(0).toUpperCase()}
                         </span>
                       )}
@@ -325,11 +325,12 @@ export default function CategoriaEspecifica() {
       {/* 5. MAIS POPULARES E RECÉM ADICIONADOS          */}
       {/* ============================================== */}
       {(populares.length > 0 || recentes.length > 0) && (
-        <section className="bg-[#F6F5ED] w-full pt-16 pb-12 px-6 md:px-12 flex justify-center">
+        <section className="bg-[#F6F5ED] dark:bg-[#1A1A1A] w-full pt-16 pb-12 px-6 md:px-12 flex justify-center transition-colors duration-300">
           <div className="max-w-[1200px] w-full flex flex-col gap-16">
+            
             {populares.length > 0 && (
               <div>
-                <h2 className="text-black text-3xl font-bold mb-8">Mais populares</h2>
+                <h2 className="text-black dark:text-white text-3xl font-bold mb-8 transition-colors duration-300">Mais populares</h2>
                 <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4">
                   {populares.map((produto: any) => (
                     <div key={produto.id} className="min-w-[220px] snap-start">
@@ -342,7 +343,7 @@ export default function CategoriaEspecifica() {
 
             {recentes.length > 0 && (
               <div>
-                <h2 className="text-black text-3xl font-bold mb-8">Recém adicionados</h2>
+                <h2 className="text-black dark:text-white text-3xl font-bold mb-8 transition-colors duration-300">Recém adicionados</h2>
                 <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4">
                   {recentes.map((produto: any) => (
                     <div key={produto.id} className="min-w-[220px] snap-start">

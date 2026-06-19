@@ -124,15 +124,21 @@ export default function ModalEditarProduto({
     return '';
   }
 
-  function temImagemNoSlot(index: number): boolean {
-    return !!prevsImagens[index] || !!imagensExistentes[index];
-  }
-
   async function handleSalvar() {
     if (!nome.trim() || !preco) {
       alert('Nome e preço são obrigatórios!');
       return;
     }
+
+    // Tratamento seguro do preço para não dar erro no banco
+    const precoLimpo = preco.replace(/[^\d,.-]/g, '').replace(',', '.');
+    const precoFinal = parseFloat(precoLimpo);
+
+    if (isNaN(precoFinal)) {
+      alert('Por favor, insira um preço válido (ex: 49,90).');
+      return;
+    }
+
     setSaving(true);
     try {
       const token = getToken();
@@ -146,7 +152,7 @@ export default function ModalEditarProduto({
         body: JSON.stringify({
           nome: nome.trim(),
           descricao: descricao.trim(),
-          preco: parseFloat(preco.replace(',', '.')),
+          preco: precoFinal,
           estoque,
           id_categoria: Number(idCategoria) || null,
         }),
@@ -211,21 +217,30 @@ export default function ModalEditarProduto({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-[#EDEDED] w-[90%] max-w-[500px] rounded-[2rem] p-8 shadow-2xl relative max-h-[95vh] overflow-y-auto scrollbar-hide">
+  function CameraIcon({ size = 28 }: { size?: number }) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+        <circle cx="12" cy="13" r="4" />
+      </svg>
+    );
+  }
 
-        <button onClick={handleFechar} className="absolute top-6 right-6 text-black hover:text-gray-500 transition-colors">
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
+      <div className="bg-[#EBEBEB] dark:bg-[#2A2A2A] w-[90%] max-w-[500px] rounded-[2rem] p-8 shadow-2xl relative max-h-[95vh] overflow-y-auto scrollbar-hide transition-colors duration-300">
+
+        <button onClick={handleFechar} className="absolute top-6 right-6 text-black dark:text-white hover:text-gray-500 dark:hover:text-gray-300 transition-colors cursor-pointer">
           <X size={24} />
         </button>
 
-        <h2 className="text-2xl font-bold text-center text-black mb-6 mt-1">
+        <h2 className="text-2xl font-bold text-center text-black dark:text-white mb-6 mt-1 transition-colors duration-300">
           Editar Produto
         </h2>
 
         {loading ? (
           <div className="flex justify-center py-16">
-            <p className="text-gray-500 animate-pulse">Carregando produto...</p>
+            <p className="text-gray-500 dark:text-gray-400 animate-pulse transition-colors duration-300">Carregando produto...</p>
           </div>
         ) : (
           <>
@@ -240,17 +255,14 @@ export default function ModalEditarProduto({
               />
               <div
                 onClick={() => inputRefs[0].current?.click()}
-                className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl h-[120px] flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/40 transition-colors mb-3 overflow-hidden"
+                className="w-full border-[2px] border-dashed border-[#7C3AED] rounded-2xl h-[120px] flex flex-col items-center justify-center cursor-pointer hover:bg-purple-50/40 dark:hover:bg-[#7C3AED]/10 transition-colors mb-3 overflow-hidden"
               >
                 {getImagemSrc(0) ? (
                   <img src={getImagemSrc(0)} alt="Preview principal" className="w-full h-full object-cover" />
                 ) : (
                   <>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                      <circle cx="12" cy="13" r="4" />
-                    </svg>
-                    <span className="text-sm text-gray-500 mt-2">Anexe as fotos do seu produto</span>
+                    <CameraIcon size={32} />
+                    <span className="text-sm text-gray-500 dark:text-gray-400 mt-2 transition-colors duration-300">Anexe as fotos do seu produto</span>
                   </>
                 )}
               </div>
@@ -267,15 +279,12 @@ export default function ModalEditarProduto({
                     />
                     <div
                       onClick={() => inputRefs[i].current?.click()}
-                      className="border-[2px] border-dashed border-[#7C3AED] rounded-2xl h-[90px] flex items-center justify-center cursor-pointer hover:bg-purple-50/40 transition-colors overflow-hidden"
+                      className="border-[2px] border-dashed border-[#7C3AED] rounded-2xl h-[90px] flex items-center justify-center cursor-pointer hover:bg-purple-50/40 dark:hover:bg-[#7C3AED]/10 transition-colors overflow-hidden"
                     >
                       {getImagemSrc(i) ? (
                         <img src={getImagemSrc(i)} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
                       ) : (
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                          <circle cx="12" cy="13" r="4" />
-                        </svg>
+                        <CameraIcon size={22} />
                       )}
                     </div>
                   </div>
@@ -290,14 +299,14 @@ export default function ModalEditarProduto({
                 placeholder="Nome do produto"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                className="w-full px-5 py-3 rounded-full bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm"
+                className="w-full px-5 py-3 rounded-full bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm transition-colors duration-300"
               />
 
               <div className="relative">
                 <select
                   value={idCategoria}
                   onChange={(e) => setIdCategoria(e.target.value)}
-                  className="w-full px-5 py-3 rounded-full bg-white text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm appearance-none cursor-pointer"
+                  className="w-full px-5 py-3 rounded-full bg-white dark:bg-[#1A1A1A] text-gray-500 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm appearance-none cursor-pointer transition-colors duration-300"
                 >
                   <option value="" disabled>Selecione uma categoria</option>
                   {categorias.map((cat) => (
@@ -306,7 +315,7 @@ export default function ModalEditarProduto({
                     </option>
                   ))}
                 </select>
-                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-500 transition-colors duration-300">
                   <svg width="12" height="7" viewBox="0 0 12 7" fill="none">
                     <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
@@ -318,7 +327,7 @@ export default function ModalEditarProduto({
                 value={descricao}
                 onChange={(e) => setDescricao(e.target.value)}
                 rows={3}
-                className="w-full px-5 py-3 rounded-2xl bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm resize-none"
+                className="w-full px-5 py-3 rounded-2xl bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm resize-none transition-colors duration-300"
               />
 
               <input
@@ -326,7 +335,7 @@ export default function ModalEditarProduto({
                 placeholder="Preço do produto"
                 value={preco}
                 onChange={(e) => setPreco(e.target.value)}
-                className="w-full px-5 py-3 rounded-full bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm"
+                className="w-full px-5 py-3 rounded-full bg-white dark:bg-[#1A1A1A] text-gray-700 dark:text-white placeholder:text-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7C3AED] shadow-sm transition-colors duration-300"
               />
             </div>
 
@@ -339,7 +348,7 @@ export default function ModalEditarProduto({
                 <Image src="/Menos-token.png" alt="Diminuir" fill className="object-contain" />
               </button>
 
-              <span className="text-2xl font-bold text-black w-8 text-center">{estoque}</span>
+              <span className="text-2xl font-bold text-black dark:text-white w-8 text-center transition-colors duration-300">{estoque}</span>
 
               <button
                 onClick={() => setEstoque((prev) => prev + 1)}
@@ -353,7 +362,7 @@ export default function ModalEditarProduto({
             <button
               onClick={handleDeletar}
               disabled={deleting}
-              className="w-full bg-[#FF0000] text-white font-bold text-sm py-3 rounded-full shadow-md hover:bg-red-700 transition-colors mb-6 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-[#FF0000] text-white font-bold text-sm py-3 rounded-full shadow-md hover:bg-red-700 transition-colors mb-4 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {deleting ? 'Excluindo...' : 'DELETAR PRODUTO'}
             </button>

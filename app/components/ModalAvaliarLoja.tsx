@@ -56,17 +56,16 @@ export default function ModalAvaliarLoja({ isOpen, onClose, nomeLoja = "Rare Bea
   }
 }
 
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       
       {/* Container Principal da Modal */}
-      <div className="bg-[#EBEBEB] w-[90%] max-w-[650px] p-8 md:p-10 rounded-[2rem] shadow-2xl relative">
+      <div className="bg-[#EBEBEB] dark:bg-[#2A2A2A] w-[90%] max-w-[650px] p-8 md:p-10 rounded-[2rem] shadow-2xl relative transition-colors duration-300">
         
         {/* Botão Fechar (X) */}
         <button 
           onClick={onClose} 
-          className="absolute top-6 right-6 text-black hover:text-gray-600 transition-colors"
+          className="absolute top-6 right-6 text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -75,8 +74,8 @@ export default function ModalAvaliarLoja({ isOpen, onClose, nomeLoja = "Rare Bea
         </button>
 
         {/* Título */}
-        <h2 className="text-[22px] md:text-2xl font-light text-center text-gray-800 mb-8 mt-2">
-          Você está avaliando <span className="font-bold text-black ml-1 text-2xl md:text-3xl">{nomeLoja}</span>
+        <h2 className="text-[22px] md:text-2xl font-light text-center text-gray-800 dark:text-gray-200 mb-8 mt-2 transition-colors duration-300">
+          Você está avaliando <span className="font-bold text-black dark:text-white ml-1 text-2xl md:text-3xl transition-colors duration-300">{nomeLoja}</span>
         </h2>
 
         {/* ========================================== */}
@@ -123,7 +122,7 @@ export default function ModalAvaliarLoja({ isOpen, onClose, nomeLoja = "Rare Bea
           rows={10}
           value={comentario}
           onChange={(e) => setComentario(e.target.value)}
-          className="w-full bg-white rounded-2xl p-6 text-sm text-gray-700 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#7C3AED] mb-8"
+          className="w-full bg-white dark:bg-[#1A1A1A] rounded-2xl p-6 text-sm text-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#7C3AED] mb-8 transition-colors duration-300"
         />
 
         {/* ========================================== */}

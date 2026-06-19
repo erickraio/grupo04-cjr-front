@@ -1,5 +1,6 @@
 import { League_Spartan } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "./components/ThemeProvider"; 
 
 // Configurando a fonte
 const leagueSpartan = League_Spartan({ 
@@ -19,10 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      {/* Aplicando a fonte no corpo inteiro do site */}
+    <html lang="pt-BR" suppressHydrationWarning>
       <body className={leagueSpartan.className}>
-        {children}
+        {/* Envolvendo toda a aplicação com o ThemeProvider */}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

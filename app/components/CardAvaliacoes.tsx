@@ -28,7 +28,7 @@ export default function CardAvaliacao({ data, usuarioLogadoId, abrirModalEdicao,
       onClick={() => { 
         if (!isDragging) router.push(`/avaliacao/${data.id}`); 
       }}
-      className="bg-[#fcfbf7] hover:bg-[#f5f4ef] transition-colors rounded-[2.5rem] p-8 min-w-[450px] shadow-sm snap-start flex flex-col gap-4 border border-gray-100 cursor-pointer"
+      className="bg-[#fcfbf7] dark:bg-[#2A2A2A] hover:bg-[#f5f4ef] dark:hover:bg-[#3A3A3A] transition-colors duration-300 rounded-[2.5rem] p-8 min-w-[450px] shadow-sm snap-start flex flex-col gap-4 border border-gray-100 dark:border-transparent cursor-pointer"
     >
       <div className="flex justify-between items-center">
         
@@ -38,7 +38,7 @@ export default function CardAvaliacao({ data, usuarioLogadoId, abrirModalEdicao,
               e.stopPropagation();
               router.push(`/perfil/${data.id_usuario}`);
             }}
-            className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 cursor-pointer hover:opacity-80 transition"
+            className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
           >
             <img
               src={resolverUrl(data.usuario?.foto_perfil_url) || "/images/rosto.png"}
@@ -46,7 +46,7 @@ export default function CardAvaliacao({ data, usuarioLogadoId, abrirModalEdicao,
               className="w-full h-full object-cover"
             />
           </div>
-          <p className="font-bold text-xl text-gray-900">
+          <p className="font-bold text-xl text-gray-900 dark:text-white transition-colors duration-300">
             {data.usuario?.nome ?? data.usuario?.username ?? "Usuário"}
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function CardAvaliacao({ data, usuarioLogadoId, abrirModalEdicao,
                 e.stopPropagation(); 
                 abrirModalEdicao(data); 
               }}
-              className="w-[27px] h-[27px] bg-[#fcfbf7] rounded-full flex items-center justify-center hover:bg-gray-200 transition cursor-pointer"
+              className="w-[27px] h-[27px] bg-[#fcfbf7] dark:bg-[#3A3A3A] rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 cursor-pointer"
             >
               <Image src="/images/lapis2.png" alt="Editar" width={17} height={17} />
             </button>
@@ -72,7 +72,7 @@ export default function CardAvaliacao({ data, usuarioLogadoId, abrirModalEdicao,
         </div>
       </div>
 
-      <p className="text-gray-700 text-lg">{data.comentario}</p>
+      <p className="text-gray-700 dark:text-gray-300 text-lg transition-colors duration-300">{data.comentario}</p>
     </div>
   );
 }
