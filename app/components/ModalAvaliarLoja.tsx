@@ -125,9 +125,9 @@ export default function ModalAvaliarLoja({ isOpen, onClose, nomeLoja = "Rare Bea
           className="w-full bg-white dark:bg-[#1A1A1A] rounded-2xl p-6 text-sm text-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#7C3AED] mb-8 transition-colors duration-300"
         />
 
-        {/* ========================================== */}
-        {/* BOTÃO AVALIAR                              */}
-        {/* ========================================== */}
+        {/* =========================================== */}
+        {/* BOTÃO AVALIAR                               */}
+        {/* =========================================== */}
         <div className="flex justify-center">
           <button 
             onClick={handleSubmit}
