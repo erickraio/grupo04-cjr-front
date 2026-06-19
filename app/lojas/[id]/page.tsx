@@ -282,6 +282,7 @@ export default function Loja() {
                   usuarioLogadoId={usuarioLogadoId || undefined}
                   isDragging={isDragging}
                   abrirModalEdicao={handleAbrirModalEdicao}
+                  tipo="loja"
                 />
               ))}
 
