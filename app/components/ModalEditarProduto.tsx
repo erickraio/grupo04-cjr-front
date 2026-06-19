@@ -339,8 +339,8 @@ export default function ModalEditarProduto({
               />
             </div>
 
-            {/* Controle de estoque */}
-            <div className="flex items-center justify-center gap-6 mb-6">
+            {/* ── Controle de Estoque Interativo ── */}
+            <div className="flex items-center justify-center gap-4 mb-6">
               <button
                 onClick={() => setEstoque((prev) => Math.max(0, prev - 1))}
                 className="w-10 h-10 relative hover:scale-110 transition-transform cursor-pointer"
@@ -348,7 +348,16 @@ export default function ModalEditarProduto({
                 <Image src="/Menos-token.png" alt="Diminuir" fill className="object-contain" />
               </button>
 
-              <span className="text-2xl font-bold text-black dark:text-white w-8 text-center transition-colors duration-300">{estoque}</span>
+              <input
+                type="text"
+                value={estoque}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, ''); // Garante que só entram números
+                  setEstoque(val === '' ? 0 : parseInt(val, 10));
+                }}
+                className="text-2xl font-bold text-black dark:text-white w-20 py-1 text-center bg-transparent border border-transparent hover:border-gray-300 dark:hover:border-gray-600 focus:border-[#7C3AED] dark:focus:border-[#7C3AED] focus:outline-none rounded-xl transition-all duration-300"
+                title="Pode digitar a quantidade diretamente"
+              />
 
               <button
                 onClick={() => setEstoque((prev) => prev + 1)}

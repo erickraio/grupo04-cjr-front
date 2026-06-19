@@ -88,7 +88,6 @@ export default function ModalCriarProduto({
   }
 
   // ── Submit ────────────────────────────────────────────────
-  // ── Submit ────────────────────────────────────────────────
   async function handleAdicionar() {
     if (!nome.trim() || !preco) {
       alert('Nome e preço são obrigatórios!');
@@ -193,7 +192,7 @@ export default function ModalCriarProduto({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-     <div className="bg-[#EDEDED] dark:bg-[#2A2A2A] w-[90%] max-w-[500px] rounded-[2rem] p-8 shadow-2xl relative max-h-[1020px] transition-colors duration-300">
+     <div className="bg-[#EDEDED] dark:bg-[#2A2A2A] w-[90%] max-w-[500px] rounded-[2rem] p-8 shadow-2xl relative max-h-[95vh] overflow-y-auto scrollbar-hide transition-colors duration-300">
 
         {/* Botão fechar */}
         <button onClick={handleFechar} className="absolute top-6 right-6 text-black dark:text-white hover:text-gray-500 dark:hover:text-gray-300 transition-colors cursor-pointer">
@@ -304,8 +303,8 @@ export default function ModalCriarProduto({
           </div>
         </div>
 
-        {/* Controle de estoque */}
-        <div className="flex items-center justify-center gap-6 mb-6">
+        {/* ── Controle de Estoque Interativo ── */}
+        <div className="flex items-center justify-center gap-4 mb-6">
           <button
             onClick={() => setEstoque((prev) => Math.max(0, prev - 1))}
             className="w-10 h-10 relative hover:scale-110 transition-transform cursor-pointer"
@@ -313,13 +312,22 @@ export default function ModalCriarProduto({
              <Image src="/Menos-token.png" alt="Diminuir quantidade" fill className="object-contain" />
           </button>
 
-          <span className="text-2xl font-bold text-black dark:text-white w-8 text-center transition-colors duration-300">{estoque}</span>
+          <input
+            type="text"
+            value={estoque}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, ''); // Garante que só entram números
+              setEstoque(val === '' ? 0 : parseInt(val, 10));
+            }}
+            className="text-2xl font-bold text-black dark:text-white w-20 py-1 text-center bg-transparent border border-transparent hover:border-gray-300 dark:hover:border-gray-600 focus:border-[#7C3AED] dark:focus:border-[#7C3AED] focus:outline-none rounded-xl transition-all duration-300"
+            title="Pode digitar a quantidade diretamente"
+          />
+
           <button
             onClick={() => setEstoque((prev) => prev + 1)}
              className="w-10 h-10 relative hover:scale-110 transition-transform cursor-pointer"
           >
              <Image src="/Mais-token.png" alt="Aumentar quantidade" fill className="object-contain" />
-            +
           </button>
         </div>
 
