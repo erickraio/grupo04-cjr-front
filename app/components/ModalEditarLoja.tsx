@@ -114,10 +114,15 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados, onLojaAtua
       const token = getToken();
       const formData = new FormData();
       
-      // 1. Envia o nome (A loja não possui categoria no banco, então omitimos o id_categoria)
+      // 1. Envia o nome da loja
       formData.append('nome', nomeLoja);
       
-      // 2. CORREÇÃO: Usar os nomes exatos esperados pelo Back-end
+      // 2. Envia o ID da categoria selecionada se ela existir
+      if (idCategoria) {
+        formData.append('id_categoria', idCategoria);
+      }
+      
+      // 3. Envia os arquivos de mídia esperados pelo Back-end
       if (fotoPerfilFile) formData.append('foto_url', fotoPerfilFile);
       if (logoFile) formData.append('logo_url', logoFile);
       if (bannerFile) formData.append('banner_url', bannerFile);
@@ -138,6 +143,7 @@ export default function ModalEditarLoja({ isOpen, onClose, lojaDados, onLojaAtua
       console.error(err);
       alert("Não foi possível salvar as alterações.");
     } finally {
+      // O finally serve apenas para resetar o estado de carregamento do botão
       setSalvando(false);
     }
   };

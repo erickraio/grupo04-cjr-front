@@ -70,8 +70,9 @@ export default function CategoriaEspecifica() {
     }
   }
 
+  const subcategoriaIds = (categoria?.subcategorias || []).map((s: any) => s.id);
   const produtosDaCategoria = todosProdutos.filter(
-    (p: any) => p.id_categoria === idCategoria
+    (p: any) => p.id_categoria === idCategoria || subcategoriaIds.includes(p.id_categoria)
   );
 
   const produtosPorSub = subcategoriaSelecionada

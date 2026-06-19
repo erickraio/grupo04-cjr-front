@@ -142,7 +142,23 @@ export default function Home() {
     }
   };
   
+<<<<<<< HEAD
   // Efeito para buscar os dados ao carregar a página
+=======
+  // 1. Estados para guardar os dados do banco
+  const [categorias, setCategorias] = useState([]);
+  const [produtos, setProdutos] = useState([]);
+  const [lojas, setLojas] = useState([]);
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState<number | null>(null);
+  const [menuFiltroAberto, setMenuFiltroAberto] = useState(false);
+
+  // Se houver uma categoria selecionada, filtra as lojas. Se não, mostra todas.
+  const lojasFiltradas = categoriaSelecionada
+    ? lojas.filter((loja: any) => loja.id_categoria === categoriaSelecionada)
+    : lojas;
+
+  // 2. Efeito para buscar os dados ao carregar a página
+>>>>>>> 6888956241d9cc2b77387bb5f0691385f4711d1e
   useEffect(() => {
     const carregarDados = async () => {
       try {
@@ -258,18 +274,24 @@ export default function Home() {
           </div>
 
           {/* Secção Lojas */}
-          <div className="mt-12 mb-20">
-            <div className="flex justify-between items-end mb-8">
+          <div className="flex justify-between items-end mb-8">
               <h2 className="text-3xl font-bold text-black dark:text-white transition-colors">Lojas</h2>
               
-              {/* Botão de Filtro */}
-              <button className="flex items-center gap-12 bg-white dark:bg-[#2A2A2A] rounded-full px-6 py-2 shadow-sm text-[#A78BFA] dark:text-[#9b73f8] font-medium text-lg border border-transparent hover:border-indigo-100 dark:hover:border-gray-600 transition-all">
-                filtros
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
+              {/* Filtro de Lojas com Dropdown */}
+              <div className="relative">
+                <button 
+                  onClick={() => setMenuFiltroAberto(!menuFiltroAberto)}
+                  className="flex items-center gap-12 bg-white dark:bg-[#2A2A2A] rounded-full px-6 py-2 shadow-sm text-[#A78BFA] dark:text-[#9b73f8] font-medium text-lg border border-transparent hover:border-indigo-100 dark:hover:border-gray-600 transition-all"
+                >
+                  {/* Se tiver categoria selecionada, mostra o nome dela, senão mostra "filtros" */}
+                  {categoriaSelecionada 
+                    ? categorias.find((c: any) => c.id === categoriaSelecionada)?.nome 
+                    : 'filtros'}
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${menuFiltroAberto ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
             {/* Lista Horizontal de Lojas */}
             <div 
@@ -298,11 +320,39 @@ export default function Home() {
                       <span className="text-lg font-medium text-black dark:text-white transition-colors duration-300">{loja.nome}</span>
                     </div>
                   </div>
-                </Link>
-              ))}
+                )}
+              </div>
             </div>
-          </div>
 
+            {/* Lista Horizontal de Lojas (AGORA USANDO lojasFiltradas) */}
+            <div className="flex gap-6 md:gap-10 overflow-x-auto pb-4 scrollbar-hide min-h-[160px]">
+              {lojasFiltradas.length > 0 ? (
+                lojasFiltradas.map((loja: any) => (
+                  <Link href={`/lojas/${loja.id}`} key={loja.id}>
+                    <div className="flex flex-col items-center gap-3 min-w-[130px] cursor-pointer">
+                      <div className={`w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] dark:border-[#1A1A1A] bg-black text-white font-bold text-center overflow-hidden transition-colors`}>
+                        {loja.logo_url ? (
+                          <img 
+                            src={resolverUrl(loja.logo_url)} 
+                            alt={`Logo ${loja.nome}`} 
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          <span className="p-2">{loja.nome}</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col items-center leading-tight">
+                        <span className="text-lg font-medium text-black dark:text-white transition-colors duration-300">{loja.nome}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="w-full flex justify-center text-gray-500 py-8">
+                  Nenhuma loja encontrada para esta categoria.
+                </div>
+              )}
+            </div>
         </div>
       </section>
 
