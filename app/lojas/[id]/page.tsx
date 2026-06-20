@@ -48,14 +48,14 @@ export default function Loja() {
   // Estados das Modais
   const [modalEdicaoAberto, setModalEdicaoAberto] = useState(false);
   const [modalavaliacaoAberto, setModalAvaliacaoAberto] = useState(false);
-  const [modalCriarProdutoAberto, setModalCriarProdutoAberto] = useState(false); // ── NOVO ESTADO ──
+  const [modalCriarProdutoAberto, setModalCriarProdutoAberto] = useState(false);
 
-  const avaliacoesRef = useRef(null);
+  // Estados e Refs para o Carrossel
+  const produtosRef = useRef<HTMLDivElement>(null);
+  const avaliacoesRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  
   const [avaliacaoEditando, setAvaliacaoEditando] = useState<AvalProps | null>(null);
-
   const [loja, setLoja] = useState<any>(null);
   const [carregando, setCarregando] = useState(true);
 
@@ -66,7 +66,6 @@ export default function Loja() {
       setUsuarioLogado(true);
       try {
         const decoded: any = jwtDecode(token);
-        // Usa o 'sub' (padrão JWT) ou o 'id' dependendo de como o back-end mandou
         setUsuarioLogadoId(Number(decoded.sub || decoded.id)); 
       } catch (error) {
         console.error("Erro ao decodificar o token de login:", error);
@@ -74,7 +73,6 @@ export default function Loja() {
     }
   }, []);
 
-  // 2. Busca os dados da loja (separado para podermos chamar novamente após criar produto/avaliar)
   const fetchLoja = async () => {
     if (!idLoja) return;
     try {
@@ -95,20 +93,69 @@ export default function Loja() {
     fetchLoja();
   }, [idLoja]);
 
-  // Funções de arrastar (Carrossel)
-  const startDragging = (e: any, ref: any) => {
-    if (!ref.current) return;
-    setIsDragging(true);
-    setStartX(e.pageX - ref.current.offsetLeft);
-    setScrollLeft(ref.current.scrollLeft);
+  const criarFuncoesCarrossel = (ref: React.RefObject<HTMLDivElement | null>) => {
+    const handleMouseDown = (e: React.MouseEvent) => {
+      const el = ref.current;
+      if (!el) return;
+      el.dataset.isDown = 'true';
+      el.dataset.startX = String(e.pageX - el.offsetLeft);
+      el.dataset.scrollLeft = String(el.scrollLeft);
+      setIsDragging(false);
+    };
+
+    const handleMouseLeaveOrUp = () => {
+      const el = ref.current;
+      if (!el) return;
+      el.dataset.isDown = 'false';
+      setTimeout(() => setIsDragging(false), 50); 
+    };
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+      const el = ref.current;
+      if (!el || el.dataset.isDown !== 'true') return;
+      e.preventDefault();
+      setIsDragging(true);
+      
+      const x = e.pageX - el.offsetLeft;
+      const walk = (x - Number(el.dataset.startX || 0)); 
+      el.scrollLeft = Number(el.dataset.scrollLeft || 0) - walk;
+    };
+
+    return {
+      onMouseDown: handleMouseDown,
+      onMouseLeave: handleMouseLeaveOrUp,
+      onMouseUp: handleMouseLeaveOrUp,
+      onMouseMove: handleMouseMove,
+    };
   };
-  const stopDragging = () => setIsDragging(false);  
-  const onDrag = (e: any, ref: any) => {
-    if (!isDragging || !ref.current) return;
-    e.preventDefault();
-    const x = e.pageX - ref.current.offsetLeft;
-    ref.current.scrollLeft = scrollLeft - (x - startX);
-  };
+
+  const eventosProdutos = criarFuncoesCarrossel(produtosRef);
+  const eventosAvaliacoes = criarFuncoesCarrossel(avaliacoesRef);
+
+  useEffect(() => {
+    const applyWheelListener = (ref: React.RefObject<HTMLDivElement | null>) => {
+      const el = ref.current;
+      if (!el) return;
+
+      const handleNativeWheel = (e: WheelEvent) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          el.scrollLeft += e.deltaY;
+        }
+      };
+
+      el.addEventListener('wheel', handleNativeWheel, { passive: false });
+      return () => el.removeEventListener('wheel', handleNativeWheel);
+    };
+
+    const cleanupProd = applyWheelListener(produtosRef);
+    const cleanupAval = applyWheelListener(avaliacoesRef);
+
+    return () => {
+      if (cleanupProd) cleanupProd();
+      if (cleanupAval) cleanupAval();
+    };
+  }, [loja]); 
 
   const handleAbrirModalEdicao = (avaliacao: AvalProps) => {
     setAvaliacaoEditando(avaliacao);
@@ -137,7 +184,6 @@ export default function Loja() {
   const avaliacoes = loja.avaliacoes || [];
   const totalavaliacoes = avaliacoes.length;
   
-  // ── VERIFICAÇÃO DE DONO DA LOJA ──
   const isOwner = usuarioLogadoId !== null && loja.id_dono === usuarioLogadoId; 
 
   const mediaNota = totalavaliacoes > 0 
@@ -232,9 +278,15 @@ export default function Loja() {
           {(!loja?.produtos || loja.produtos.length === 0) ? (
             <p className="text-gray-500 dark:text-gray-400 italic transition-colors duration-300">Esta loja ainda não possui nenhum produto cadastrado.</p>
           ) : (
-            <div className="flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide">
+            <div 
+              ref={produtosRef}
+              {...eventosProdutos}
+              className={`flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide select-none ${
+                isDragging ? "cursor-grabbing" : "cursor-grab"
+              }`}
+            >
               {loja.produtos.map((produto: ProdutoProps) => (
-                <div key={produto.id} className="min-w-[220px] md:min-w-[260px]">
+                <div key={produto.id} className={`min-w-[220px] md:min-w-[260px] ${isDragging ? 'pointer-events-none' : ''}`} draggable="false">
                   <CardProduto data={{ ...produto, loja: { id: loja.id, nome: loja.nome, logo_url: loja.logo_url } }} />
                 </div>
               ))}
@@ -267,22 +319,21 @@ export default function Loja() {
       
             <div
               ref={avaliacoesRef}
-              onMouseDown={(e) => startDragging(e, avaliacoesRef)}
-              onMouseLeave={stopDragging}
-              onMouseUp={stopDragging}
-              onMouseMove={(e) => onDrag(e, avaliacoesRef)}
+              {...eventosAvaliacoes}
               className={`flex flex-row gap-6 overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] select-none ${
                 isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x"
               }`}
             >
               {loja?.avaliacoes?.map((avaliacao: any) => (
-                <CardAvaliacao 
-                  key={avaliacao.id} 
-                  data={avaliacao} 
-                  usuarioLogadoId={usuarioLogadoId || undefined}
-                  isDragging={isDragging}
-                  abrirModalEdicao={handleAbrirModalEdicao}
-                />
+                <div key={avaliacao.id} className={isDragging ? 'pointer-events-none' : ''}>
+                  <CardAvaliacao 
+                    data={avaliacao} 
+                    usuarioLogadoId={usuarioLogadoId || undefined}
+                    isDragging={isDragging}
+                    abrirModalEdicao={handleAbrirModalEdicao}
+                    tipo="loja"
+                  />
+                </div>
               ))}
 
               {(!loja?.avaliacoes || loja.avaliacoes.length === 0) && (
@@ -300,21 +351,21 @@ export default function Loja() {
         onClose={() => setModalAvaliacaoAberto(false)}
         nomeLoja={loja?.nome}
         idLoja={loja?.id}
-        onAvaliacaoCriada={fetchLoja} // Atualiza a página após avaliar
+        onAvaliacaoCriada={fetchLoja} 
       />
 
       <ModalEditarAvaliacao
         isOpen={modalEdicaoAberto}
         avaliacao={avaliacaoEditando}
         onClose={() => setModalEdicaoAberto(false)}
-        onAvaliacaoAtualizada={fetchLoja} // Atualiza a página após editar
+        onAvaliacaoAtualizada={fetchLoja} 
       />
 
       <ModalCriarProduto
         isOpen={modalCriarProdutoAberto}
         onClose={() => setModalCriarProdutoAberto(false)}
         idLoja={loja?.id}
-        onProdutoCriado={fetchLoja} // Atualiza a página após criar produto
+        onProdutoCriado={fetchLoja} 
       />
     </div>
   );

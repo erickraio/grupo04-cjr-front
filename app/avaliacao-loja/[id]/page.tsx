@@ -63,7 +63,7 @@ function calcularTempoPassado(dataIso: string) {
   return "Agora";
 }
 
-export default function TelaAvaliacaoIdentica() {
+export default function TelaAvaliacaoLoja() {
   const params = useParams();
   const router = useRouter();
   const idAvaliacao = params?.id;
@@ -71,7 +71,6 @@ export default function TelaAvaliacaoIdentica() {
   const [dados, setDados] = useState<AvaliacaoData | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [idUsuarioLogado, setIdUsuarioLogado] = useState<number | null>(null);
-  const [isLoja, setIsLoja] = useState(false);
 
   const [novoComentario, setNovoComentario] = useState("");
 
@@ -81,19 +80,10 @@ export default function TelaAvaliacaoIdentica() {
 
   const carregarDados = async () => {
     try {
-      const resProduto = await fetch(`${API_URL}/aval-produto/${idAvaliacao}`);
-      if (resProduto.ok) {
-        setDados(await resProduto.json());
-        setIsLoja(false);
-      } else {
-        const resLoja = await fetch(`${API_URL}/aval-loja/${idAvaliacao}`);
-        if (resLoja.ok) {
-          setDados(await resLoja.json());
-          setIsLoja(true);
-        } else {
-          throw new Error("Avaliação não encontrada");
-        }
-      }
+      const response = await fetch(`${API_URL}/aval-loja/${idAvaliacao}`);
+      if (!response.ok) throw new Error("Erro ao carregar");
+      const data = await response.json();
+      setDados(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -106,27 +96,20 @@ export default function TelaAvaliacaoIdentica() {
     if (idAvaliacao) carregarDados();
   }, [idAvaliacao]);
 
+
   async function handleAdicionarComentario(e: React.FormEvent) {
     e.preventDefault();
     if (!novoComentario.trim()) return;
     const token = getToken();
 
     try {
-      const url = isLoja
-        ? `${API_URL}/coment-aval`
-        : `${API_URL}/aval-produto/${idAvaliacao}/comentario`;
-
-      const body = isLoja
-        ? JSON.stringify({ comentario: novoComentario, id_avaliacao_loja: Number(idAvaliacao) })
-        : JSON.stringify({ comentario: novoComentario });
-
-      const res = await fetch(url, {
+      const res = await fetch(`${API_URL}/aval-loja/${idAvaliacao}/comentario`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body,
+        body: JSON.stringify({ comentario: novoComentario }),
       });
 
       if (res.ok) {
@@ -151,11 +134,7 @@ export default function TelaAvaliacaoIdentica() {
     const token = getToken();
 
     try {
-      const url = isLoja
-        ? `${API_URL}/coment-aval/${comentarioSendoEditado.id}`
-        : `${API_URL}/aval-produto/comentario/${comentarioSendoEditado.id}`;
-
-      const res = await fetch(url, {
+      const res = await fetch(`${API_URL}/aval-loja/comentario/${comentarioSendoEditado.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -178,7 +157,7 @@ export default function TelaAvaliacaoIdentica() {
   if (carregando) {
     return (
       <div className="bg-[#f6f3e4] dark:bg-[#1A1A1A] min-h-screen flex items-center justify-center transition-colors duration-300">
-        <p className="text-gray-500 dark:text-gray-400 text-lg transition-colors duration-300">Carregando detalhes...</p>
+        <p className="text-gray-500 dark:text-gray-400 text-lg transition-colors duration-300">Carregando detalhes da loja...</p>
       </div>
     );
   }
@@ -204,7 +183,7 @@ export default function TelaAvaliacaoIdentica() {
               </div>
               <div>
                 <h2 className="text-xl font-bold">{dados?.usuario?.nome || "Usuário"}</h2>
-                <span className="text-xs text-gray-400">Avaliação Principal</span>
+                <span className="text-xs text-gray-400">Avaliação da Loja</span>
               </div>
             </div>
 

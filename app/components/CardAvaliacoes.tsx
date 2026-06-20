@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import {useRouter} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -18,15 +18,22 @@ interface CardAvaliacaoProps {
   usuarioLogadoId?: number; 
   abrirModalEdicao?: (avaliacao: any) => void;
   isDragging?: boolean;
+  tipo?: 'produto' | 'loja';
 }
 
-export default function CardAvaliacao({ data, usuarioLogadoId, abrirModalEdicao, isDragging }: CardAvaliacaoProps) {
+export default function CardAvaliacao({ data, usuarioLogadoId, abrirModalEdicao, isDragging, tipo = 'produto' }: CardAvaliacaoProps) {
   const router = useRouter();
 
   return (
     <div
       onClick={() => { 
-        if (!isDragging) router.push(`/avaliacao/${data.id}`); 
+        if (!isDragging) {
+          if (tipo === 'loja') {
+            router.push(`/avaliacao-loja/${data.id}`);
+          } else {
+            router.push(`/avaliacao/${data.id}`);
+          }
+        }
       }}
       className="bg-[#fcfbf7] dark:bg-[#2A2A2A] hover:bg-[#f5f4ef] dark:hover:bg-[#3A3A3A] transition-colors duration-300 rounded-[2.5rem] p-8 min-w-[450px] shadow-sm snap-start flex flex-col gap-4 border border-gray-100 dark:border-transparent cursor-pointer"
     >

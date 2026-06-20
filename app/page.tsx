@@ -4,17 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import Navbar from "./components/navbar";
 import Image from "next/image";
 
-// ==========================================
-// COMPONENTE PRINCIPAL (PÁGINA)
 import Searchbar from "./components/searchbar";
 import axios from "axios";
 import Link from "next/link";
 import CardProdutos from "./components/CardProdutos";
-// ==========================================
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-// Função para resolver o caminho correto da imagem
 function resolverUrl(url: string | undefined): string {
   if (!url) return '';
   if (url.startsWith('http')) return url;
@@ -31,18 +27,15 @@ export default function Home() {
   const [produtos, setProdutos] = useState<any[]>([]);
   const [lojas, setLojas] = useState<any[]>([]);
 
-  // Estados do Filtro
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState<number | null>(null);
+  // Estados dos Filtros de Loja
   const [menuFiltroAberto, setMenuFiltroAberto] = useState(false);
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState<number | null>(null);
 
-  // ==========================================
-  // CONFIGURAÇÃO DOS REFS E LÓGICA DE ARRASTAR
-  // ==========================================
+  // Refs para carrosséis
   const categoriasRef = useRef<HTMLDivElement>(null);
   const produtosRef = useRef<HTMLDivElement>(null);
   const lojasRef = useRef<HTMLDivElement>(null);
 
-  // Lógica do Clique e Arrasta
   const criarFuncoesCarrossel = (ref: React.RefObject<HTMLDivElement | null>) => {
     const handleMouseDown = (e: React.MouseEvent) => {
       const el = ref.current;
@@ -80,7 +73,6 @@ export default function Home() {
   const eventosProdutos = criarFuncoesCarrossel(produtosRef);
   const eventosLojas = criarFuncoesCarrossel(lojasRef);
 
-  // EFEITO MÁGICO: Trava o scroll vertical da página quando estiver rolando o carrossel
   useEffect(() => {
     const applyWheelListener = (ref: React.RefObject<HTMLDivElement | null>) => {
       const el = ref.current;
@@ -88,12 +80,11 @@ export default function Home() {
 
       const handleNativeWheel = (e: WheelEvent) => {
         if (e.deltaY !== 0) {
-          e.preventDefault(); // <-- TRAVA O SCROLL DA PÁGINA AQUI!
-          el.scrollLeft += e.deltaY; // Rola o carrossel horizontalmente
+          e.preventDefault(); 
+          el.scrollLeft += e.deltaY; 
         }
       };
 
-      // O "passive: false" é o que permite o e.preventDefault() funcionar no scroll
       el.addEventListener('wheel', handleNativeWheel, { passive: false });
 
       return () => {
@@ -111,9 +102,6 @@ export default function Home() {
       if (cleanupLoj) cleanupLoj();
     };
   }, []);
-  // ==========================================
-
-  // Função para mapear o nome da categoria para o ícone correto
   const getCategoriaIcone = (nome: string) => {
     const nomeFormatado = nome.toLowerCase();
 
@@ -136,7 +124,7 @@ export default function Home() {
     }
     setCarregando(true);
     try {
-      const response = await axios.get(`${API_URL}/produtos?busca=${(query)}`);
+      const response = await axios.get(`${API_URL}/produtos?busca=${query}`);
       setProdutosFiltrados(response.data);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
@@ -145,12 +133,7 @@ export default function Home() {
     }
   };
 
-  // Se houver uma categoria selecionada, filtra as lojas. Se não, mostra todas.
-  const lojasFiltradas = categoriaSelecionada
-    ? lojas.filter((loja: any) => loja.id_categoria === categoriaSelecionada)
-    : lojas;
-
-  // 2. Efeito para buscar os dados ao carregar a página
+  // Efeito para buscar os dados ao carregar a página
   useEffect(() => {
     const carregarDados = async () => {
       try {
@@ -175,6 +158,11 @@ export default function Home() {
 
     carregarDados();
   }, []);
+
+  // Lógica de Filtro Dinâmico das lojas baseadas no Dropdown
+  const lojasFiltradas = categoriaSelecionada
+    ? lojas.filter((loja: any) => loja.id_categoria === categoriaSelecionada || loja.categoriaId === categoriaSelecionada)
+    : lojas;
 
   return (
     <main className="min-h-screen bg-[#f6f3e4] dark:bg-[#1A1A1A] transition-colors duration-300">
@@ -224,8 +212,8 @@ export default function Home() {
               className="flex gap-4 md:gap-6 overflow-x-auto pb-6 pt-2 scrollbar-hide cursor-grab active:cursor-grabbing select-none"
             >
               {categorias.map((categoria: any) => (
-                <Link href={`/categoria/${categoria.id}`} key={categoria.id} draggable="false">
-                  <div className="flex flex-col items-center gap-3 min-w-[110px] cursor-pointer group pointer-events-none">
+                <Link href={`/categoria/${categoria.id}`} key={categoria.id} draggable="false" className="group">
+                  <div className="flex flex-col items-center gap-3 min-w-[110px] cursor-pointer pointer-events-none">
                     <div className="w-[100px] h-[100px] bg-white dark:bg-[#2A2A2A] rounded-[2rem] flex items-center justify-center shadow-[0px_4px_15px_rgba(0,0,0,0.03)] border border-transparent group-hover:border-indigo-100 dark:group-hover:border-gray-600 transition-colors">
                       <Image
                         src={getCategoriaIcone(categoria.nome)}
@@ -263,46 +251,40 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Secção Lojas */}
+          {/* Seção Lojas */}
           <div className="mb-8">
-            <div className="flex justify-between items-end mb-6">
+            <div className="flex justify-between items-end mb-6 relative">
               <h2 className="text-3xl font-bold text-black dark:text-white transition-colors">Lojas</h2>
               
               {/* Filtro de Lojas com Dropdown */}
               <div className="relative">
                 <button 
                   onClick={() => setMenuFiltroAberto(!menuFiltroAberto)}
-                  className="flex items-center gap-4 bg-white dark:bg-[#2A2A2A] rounded-full px-6 py-2 shadow-sm text-[#A78BFA] dark:text-[#9b73f8] font-medium text-lg border border-transparent hover:border-indigo-100 dark:hover:border-gray-600 transition-all"
+                  className="flex items-center gap-4 bg-white dark:bg-[#2A2A2A] rounded-full px-6 py-2 shadow-sm text-[#A78BFA] dark:text-[#9b73f8] font-medium text-lg border border-transparent hover:border-indigo-100 dark:hover:border-gray-600 transition-all cursor-pointer"
                 >
                   {categoriaSelecionada 
-                    ? categorias.find((c: any) => c.id === categoriaSelecionada)?.nome
-                    : 'Filtros'}
+                    ? categorias.find((c: any) => c.id === categoriaSelecionada)?.nome 
+                    : 'todos os filtros'}
                   
                   <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${menuFiltroAberto ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
 
-                {/* Dropdown que estava faltando */}
+                {/* Dropdown Menu */}
                 {menuFiltroAberto && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#2A2A2A] rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-50 py-2 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#2A2A2A] rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden">
                     <button
-                      onClick={() => {
-                        setCategoriaSelecionada(null);
-                        setMenuFiltroAberto(false);
-                      }}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 text-black dark:text-white transition-colors"
+                      onClick={() => { setCategoriaSelecionada(null); setMenuFiltroAberto(false); }}
+                      className="w-full text-left px-4 py-3 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 text-black dark:text-white"
                     >
-                      Todas as Lojas
+                      Todos os Filtros
                     </button>
                     {categorias.map((cat: any) => (
                       <button
                         key={cat.id}
-                        onClick={() => {
-                          setCategoriaSelecionada(cat.id);
-                          setMenuFiltroAberto(false);
-                        }}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 text-black dark:text-white transition-colors"
+                        onClick={() => { setCategoriaSelecionada(cat.id); setMenuFiltroAberto(false); }}
+                        className="w-full text-left px-4 py-3 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 text-black dark:text-white border-t border-gray-50 dark:border-gray-700"
                       >
                         {cat.nome}
                       </button>
@@ -312,17 +294,17 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Lista Horizontal de Lojas ÚNICA */}
+            {/* Lista Horizontal de Lojas ÚNICA e Corrigida */}
             <div 
               ref={lojasRef}
               {...eventosLojas}
-              className="flex gap-6 md:gap-10 overflow-x-auto pb-4 scrollbar-hide cursor-grab active:cursor-grabbing select-none min-h-[160px]"
+              className="flex gap-6 md:gap-10 overflow-x-auto pb-4 scrollbar-hide cursor-grab active:cursor-grabbing select-none min-h-[180px]"
             >
               {lojasFiltradas.length > 0 ? (
                 lojasFiltradas.map((loja: any) => (
                   <Link href={`/lojas/${loja.id}`} key={loja.id} draggable="false">
                     <div className="flex flex-col items-center gap-3 min-w-[130px] cursor-pointer pointer-events-none">
-                      <div className={`w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] dark:border-[#1A1A1A] bg-black text-white font-bold text-center overflow-hidden transition-colors`}>
+                      <div className="w-[130px] h-[130px] rounded-full flex items-center justify-center shadow-sm border-[6px] border-[#F6F5ED] dark:border-[#1A1A1A] bg-black text-white font-bold text-center overflow-hidden transition-colors">
                         {loja.logo_url ? (
                           <img 
                             src={resolverUrl(loja.logo_url)} 
@@ -331,9 +313,10 @@ export default function Home() {
                             draggable="false"
                           />
                         ) : (
-                          <span className="p-2">{loja.nome}</span>
+                          <span className="p-2 text-xs truncate max-w-full">{loja.nome}</span>
                         )}
                       </div>
+
                       <div className="flex flex-col items-center leading-tight">
                         <span className="text-lg font-medium text-black dark:text-white transition-colors duration-300">{loja.nome}</span>
                       </div>
@@ -341,13 +324,13 @@ export default function Home() {
                   </Link>
                 ))
               ) : (
-                <div className="w-full flex justify-center text-gray-500 py-8">
+                <div className="w-full flex justify-center items-center text-gray-500 dark:text-gray-400 italic py-8">
                   Nenhuma loja encontrada para esta categoria.
                 </div>
               )}
             </div>
           </div>
-          
+
         </div>
       </section>
     </main>
